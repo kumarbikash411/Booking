@@ -1,0 +1,126 @@
+<?php   $caldata = $block->getCalendarData(); 
+        $currentdate = $block->getcurrentdate();
+        $servicetime = $block->getSeriveTime();
+        $postdata = $block->getParamsData();
+        $pricehelper = $block->getPriceHelper();
+        $flag = false;
+        
+        $errormsg='';
+
+        if ($postdata['data']['fromtime_t'] == 1) {
+            $from_t = 'am';
+        } else {
+            $from_t = 'pm';
+        } 
+        if ($postdata['data']['totime_t'] == 1) {
+            $to_t = 'am';
+        } else {
+            $to_t = 'pm';
+        }
+        
+        $ftime_h = $postdata['data']['fromtime_h']<10 ? '0'.$postdata['data']['fromtime_h'] : $postdata['data']['fromtime_h'];
+        $ttime_h = $postdata['data']['totime_h']<10 ? '0'.$postdata['data']['totime_h'] : $postdata['data']['totime_h'];
+
+        $fromtime_m = $postdata['data']['fromtime_m'] <10 ? '0'.$postdata['data']['fromtime_m'] : $postdata['data']['fromtime_m'];
+
+        $totime_m = $postdata['data']['totime_m'] <10 ? '0'.$postdata['data']['totime_m'] : $postdata['data']['totime_m'];
+
+        $fromTime = $ftime_h.':'.$fromtime_m.' '.$from_t;
+        $toTime = $ttime_h.':'.$totime_m.' '.$to_t;
+
+        foreach ($caldata as $key=>$value) {
+            $var = true;
+            if (($postdata['data']['checkin'] >= $value['calendar_startdate'] && $postdata['data']['checkin']<= $value['calendar_enddate']) && ($postdata['data']['checkout'] >= $value['calendar_startdate'] && $postdata['data']['checkout']<= $value['calendar_enddate']) && $postdata['data']['checkout'] >= $postdata['data']['checkin']) {
+                
+                $Promo = $value['calendar_promo'];
+                $Price = $value['calendar_price'];
+                $date1 = strtotime($postdata['data']['checkin']);
+                $date2 = strtotime($postdata['data']['checkout']);
+                $diff = $date2 - $date1;
+                $total_days = floor($diff/(60*60*24)) + 1;
+                $var = false;
+                break;
+            } else {
+                if ($var) {
+                    $errormsg = "Invalid Dates";
+                } 
+            }
+        }
+        foreach ($servicetime as $key1 => $time) {
+
+
+            if (($fromTime >= $time['booking_service_start']) && ($toTime <= $time['booking_service_end'])) {
+
+                $No_of_hours = number_format((strtotime($toTime)-strtotime($fromTime))/(60*60),2);
+                $flag = true;
+            } else {
+
+                $No_of_hours = 0;
+                $msg = "service start from ".$time['booking_service_start']." to ".$time['booking_service_end'].'..';
+            }
+        }
+
+        if ($Promo!=0) {
+            $old_price = $total_days*$No_of_hours*$Price;
+            $total_price = $total_days*$No_of_hours*$Promo;
+        } else {
+            $total_price = $total_days*$No_of_hours*$Price;
+        }
+?>
+<div>
+<?php if ($flag && ($errormsg == '')) { ?>
+    <div>
+        <span><?php echo __('Total Days : ');?> </span>
+        <span><?php echo $total_days; ?></span>
+    </div>
+    <div>
+		<span><?php echo __('Total Hours : ');?> </span>
+		<span><?php echo ($total_days*$No_of_hours).' hours '; ?></span><span><?php
+         $hour = explode('.',$total_days*$No_of_hours) ;
+         $min = '.'.$hour[1];
+         echo ' ( '.$hour[0].' hour and '.(int)($min*60).' min )'; ?></span>
+	</div>
+	<div class="price">
+		<span><?php echo __('Price : ');?> </span>
+        <?php if ($Promo!=0) { ?>
+        <div class="old-price"><?php echo $pricehelper->currency($old_price,true,false); ?></div>
+        <div class="new-price"><?php echo $pricehelper->currency($total_price,true,false); ?></div>
+        <?php } else { ?>
+        <div class="price"><?php echo $pricehelper->currency($total_price,true,false); ?></div>
+        <?php } ?>
+	</div>
+<?php } else { 
+    if (isset($msg)) { ?>
+    <div><?php echo $msg; ?></div>
+    <?php } if ($errormsg != '') { ?>
+    <div><?php echo __('Invalid Dates'); ?></->
+    <?php } ?>
+<?php } ?>
+<input type="hidden" name="selected_check_in" value="<?php echo $postdata['data']['checkin'];?>" />
+<input type="hidden" name="selected_check_out" value="<?php echo $postdata['data']['checkout'];?>" />
+<input type="hidden" name="selected_qty" value="<?php echo $postdata['data']['qty']; ?>" />
+<input type="hidden" name="total_price" value="<?php echo $total_price; ?>" /> 
+<input type="hidden" name="total_days" value="<?php echo $total_days; ?>" />
+<input type="hidden" name="total_hours" value="<?php echo ($total_days*$No_of_hours); ?>" />
+</div>
+<?php if ($flag && ($errormsg == '')) { ?>
+     <script>
+     	require([
+			'jquery',
+			"jquery/ui",
+		],
+	function ($){
+		$('#product-addtocart-button').prop('disabled',false);
+	});
+     </script>
+<?php  } else { ?>
+<script>
+        require([
+            'jquery',
+            "jquery/ui",
+        ],
+    function ($){
+        $('#check-rent-product-avail').show();
+    });
+     </script>
+<?php } ?>

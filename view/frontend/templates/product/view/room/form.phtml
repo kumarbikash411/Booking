@@ -1,0 +1,7 @@
+<?php $productData = $block->getProduct();
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  $attrubte_set_name= $objectManager->create('Magento\Eav\Model\Entity\Attribute\Set')->load($productData->getAttributeSetId())->getAttributeSetName();
+	  if ($attrubte_set_name == 'Hotel Booking') :
+	  	echo $block->getChildHtml('room.search.form');
+	  endif; 
+?>

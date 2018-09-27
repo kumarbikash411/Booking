@@ -1,0 +1,28 @@
+<?php 
+$bookingId = $block->getBookingId();
+$bookingType = $block->getBookingType();
+$sku = $block->getSku();
+
+?>
+<?php $dataSend = array('booking_id'=>$bookingId, 'booking_type'=>$bookingType,'sku'=>$sku); ?>
+<div id="booking-light-box">
+	<div class="booking-popup-content">
+		<div class="popup-booking-right">
+			<div id="form-booking-calendar">
+			</div>
+		</div>				
+		<div class="clear"></div>
+		<div class="popup-booking-left">
+			<div id="booking-list-calendar-items" class="booking-table-items">
+				<?php /* show items calendars */ ?>
+				<?php echo $this->getLayout()->createBlock('Ced\Booking\Block\Adminhtml\BookingRentPrice')->setData($dataSend)->setTemplate('Ced_Booking::catalog/product/calendars/items.phtml')->toHtml(); ?>
+			</div>
+			<div class="clear"></div>
+			<?php /* show grid calendars */ ?>
+			<?php echo $this->getLayout()->createBlock('Ced\Booking\Block\Adminhtml\BookingRentPrice')->setData($dataSend)->setTemplate('Ced_Booking::catalog/product/calendars/calendars_grid.phtml')->toHtml(); ?>
+		</div>	
+		<div class="clear"></div>
+	</div>
+	<div class="clear"></div>
+</div>
+

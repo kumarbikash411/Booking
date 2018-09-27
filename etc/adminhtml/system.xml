@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/system_file.xsd">
+    <system>
+        <tab id="cedcommerce" translate="label" sortOrder="100">
+            <label><![CDATA[<div style="position: absolute; margin-left: -8px;"><img src="http://cedcommerce.com/media/cedcore/cedcommerce-extensions.png" alt="CedCommerce Extensions" border="0" /></div>&nbsp;]]></label>
+        </tab>
+        <tab id="csmarketplace" sortOrder="1">
+            <label>Marketplace</label>
+        </tab>
+        <section id="cedcore" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+            <tab>csmarketplace</tab>
+            <label>Installed Extensions</label>
+            <resource>Ced_Booking::cedcore</resource> 
+            <group id="installed_extensions" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Installed Extensions</label>
+                <frontend_model>Ced\Booking\Block\Extensions</frontend_model>  
+            </group>
+            <group id="feeds_group" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Notifications</label>
+                <field id="feeds" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>I'd like to be informed by CedCommerce about:</label>
+                    <source_model>Ced\Booking\Model\Source\Updates\Type</source_model>
+                 </field>             
+            </group>
+             <group id="extensions_groups" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>CedCommerce Extensions Store</label>
+                
+                <field id="extensions" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>CedCommerce</label>
+                    <frontend_model>Ced\Booking\Block\Cedcommerce\Store</frontend_model>
+                 </field>  
+              </group>
+        </section>
+        <section id="booking" translate="label" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Booking System</label>
+            <tab>cedcommerce</tab>
+            <resource>Ced_Booking::booking_settings</resource>
+            <group id="booking_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Booking Settings</label>
+                <field id="enable" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Booking System</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+
+                <field id="booking_address" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Booking Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_calendar" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Calendar</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="map_zoom" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Map Zoom</label>
+                </field>
+                <field id="map_api_key" translate="label comment" type="text" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Map API Key</label>
+                </field>
+
+
+                <field id="hotel_link_enabled" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Show Hotel Top Link</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="hotel_link_title" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Hotel Top link Title</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="hotel_link_enabled">1</field>
+                    </depends>
+                </field>
+
+                <field id="daily_link_enabled" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Show Daily Booking Top Link</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="daily_link_title" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Daily Top link Title</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="daily_link_enabled">1</field>
+                    </depends>
+                </field>
+
+
+                <field id="hourly_link_enabled" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Show Hourly Top Link</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="hourly_link_title" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Hourly Top link Title</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="hourly_link_enabled">1</field>
+                    </depends>
+                </field>
+
+            </group>
+            <group id="Filter_setting" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Filter Settings</label>
+                <field id="enable_top_filter" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Top filter</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_side_filter" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Side filter</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    
+                </field>
+                <field id="side_filter_attribute" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Select Side Filters</label>
+                    <validate>required-entry</validate>
+                    <source_model>Ced\Booking\Model\Config\Product\Attributes</source_model>
+                    <depends>
+                        <field id="enable_side_filter">1</field>
+                    </depends>
+                </field>
+            </group>
+
+
+            <group id="notification_settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Notification Settings</label>
+                <field id="email_identity" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="notification_mail_template" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Choose email template sent for the notificaiton of new email.</comment>
+                </field>
+                <field id="notification_email" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Notification Email</label>
+                    <comment>Choose email template sent for the notificaiton of new email.</comment>
+                </field>
+                <field id="admin_email_address" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Admin Email Adress</label>
+                </field>
+            </group>
+
+            <group id="banner_setting" translate="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Banner Settings</label>
+                <field id="hotel_banner" translate="label comment" type="image" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hotel Banner</label>
+                    <backend_model>Ced\Booking\Model\Config\Backend\Banner</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">booking/store/banner</upload_dir>
+                    <base_url type="media" scope_info="1">booking/store/banner</base_url>
+                    <comment>Allowed file types:PNG, GIF, JPG, JPEG.</comment>
+                </field>
+                <field id="daily_banner" translate="label comment" type="image" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Daily Banner</label>
+                    <backend_model>Ced\Booking\Model\Config\Backend\Banner</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">booking/store/banner</upload_dir>
+                    <base_url type="media" scope_info="1">booking/store/banner</base_url>
+                    <comment>Allowed file types:PNG, GIF, JPG, JPEG.</comment>
+                </field>
+                <field id="hourly_banner" translate="label comment" type="image" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hourly Banner</label>
+                    <backend_model>Ced\Booking\Model\Config\Backend\Banner</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">booking/store/banner</upload_dir>
+                    <base_url type="media" scope_info="1">booking/store/banner</base_url>
+                    <comment>Allowed file types:PNG, GIF, JPG, JPEG.</comment>
+                </field>
+                <field id="banner_width" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                   <label>Banner Image Width</label>
+                   <!-- <config_path>ced_booking/general/vshoppage_banner_image_width</config_path> -->
+                   <validate>validate-number validate-zero-or-greater</validate>
+                   <comment>[px]</comment>
+                </field>
+                <field id="banner_height" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                   <label>Banner Image Height</label>
+                   <!-- <config_path>ced_vshops/general/vshoppage_banner_image_height</config_path> -->
+                   <validate>validate-number validate-zero-or-greater</validate>
+                   <comment>[px]</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

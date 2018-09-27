@@ -1,0 +1,14 @@
+<?php $roomimages = $block->getUploadedImage(); 
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl(); ?>
+<?php foreach ($roomimages as $val){
+	    $image = $val->getRoomImages();
+	}   ?>
+<?php if (isset($image)): ?>
+<div class="room-image">
+	<img width="180" height="180" src="<?php echo $baseUrl.'pub/media/images/'.$image; ?>" />
+</div>
+<?php endif; ?>

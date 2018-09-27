@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <css src="Ced_Booking::css/booking-custom.css" />
+        <css src="Ced_Booking::css/owl.carousel.css" rel="stylesheet"/>
+        <css src="Ced_Booking::css/owl.css" rel="stylesheet"/>
+        <css rel="stylesheet" src="Ced_Booking::css/owl.theme.css"/>
+        <script type="text/javascript"  src="Ced_Booking::js/owl.carousel.js"/>
+    </head>
+    
+</page>

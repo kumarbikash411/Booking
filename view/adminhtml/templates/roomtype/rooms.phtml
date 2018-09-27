@@ -1,0 +1,87 @@
+<?php $roomtype = $block->getRoomsType(); 
+$roomtypedata = json_encode($roomtype->getData());?>
+<div id="booking_room" style="display: none">
+	<!-- <label>Room Type</label>
+	<select>
+		<option></option>
+	</select> -->
+</div>
+
+
+<script>
+
+require([
+	'jquery',
+	'Magento_Ui/js/modal/alert',
+],function($,alert){
+
+	var roomdata = '<?php echo $roomtypedata; ?>';
+
+	// $('[name="room_type"]').on('change', function() {
+
+		console.log($('[name="room_type"]').val());
+
+			var selectlist = '<label><span>Room Type</span></label>';
+
+				selectlist += '<div class="admin__field-control" id="room-child-field">';
+
+		      	selectlist += "<select name='child_room_type' class='admin__control-select'>";
+
+		    var result = $.parseJSON(roomdata);
+			if(result.length>0)
+			{ 
+			    for (var i=0 ; i<result.length; i++) {
+			    	var objroomcat = result[i]['room_category'];
+			    	var objroomtitle = result[i]['roomtype_title'];
+
+			    	if (objroomcat == $('[name="room_type"]').val()) {
+
+			    		selectlist += "<option>" + objroomtitle + "</option>";	
+			    	} 
+			    }
+			}
+			// console.log($('[name="room_type"]').val());
+	  //       console.log(objroomcat);
+	  //       console.log(objroomtitle);
+		    selectlist += "</select></div>";
+	        $('#booking_room').html(selectlist);
+	      
+	// });
+
+
+	
+		// if ($('[name="room_type"]').val() != '') {
+
+		// 	var selectlist = '<label><span>Room Type</span></label>';
+
+		// 		selectlist += '<div class="admin__field-control" id="room-child-field">';
+
+		//       	selectlist += "<select name='child_room_type' class='admin__control-select'>";
+
+		//     var result = $.parseJSON(roomdata);
+		// 	if(result.length>0)
+		// 	{ 
+		// 	    for (var i=0 ; i<result.length; i++) {
+		// 	    	var objroomcat = result[i]['room_category'];
+		// 	    	var objroomtitle = result[i]['roomtype_title'];
+
+		// 	    	if (objroomcat == $('[name="room_type"]').val()) {
+
+		// 	    		selectlist += "<option>" + objroomtitle + "</option>";	
+		// 	    	} 
+		// 	    }
+		// 	}
+		//     selectlist += "</select></div>";
+	 //        $('#room_type').html(selectlist);
+	 //        console.log($('[name="room_type"]').val());
+	 //        console.log(objroomcat);
+	 //        console.log(objroomtitle);
+	 //    } else {
+	 //    	$('#room_type').hide();
+	 //    }
+
+});
+
+
+</script>
+

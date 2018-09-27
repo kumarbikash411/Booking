@@ -1,0 +1,46 @@
+<?php   $currencySymbol = $block->getCurrencySymbol();
+        $postData = $this->getData();
+        $productData = $block->getProduct();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $this->_objectManager->create('Ced\Booking\Helper\BookingPrice')->getRentPrice($postData,$productData);
+?>
+
+<div>
+    <input type="hidden" name="total-days" value="<?php if ($helper['totaldays'] != '') {echo $helper['totaldays'];}?>"></input>
+    <input type="hidden" name="total-price" value="<?php if ($helper['totalprice'] != '') {echo $helper['totalprice'];}?>"></input>
+    <input type="hidden" name="total-hours" value="<?php if ($helper['totalhours'] != '') {echo $helper['totalhours'];}?>"></input>
+    <div>
+        <span><?php if ($helper['totaldays'] != '') { echo __('Total Days : ');?> </span>
+        <span><?php echo $helper['totaldays']; }?></span>
+    </div> 
+    <div>
+        <span><?php if ($helper['totalhours'] != '') { echo __('Total Hours : ');?> </span>
+        <span><?php $time = explode('.',$helper['totalhours']);
+                    if ($time[1] != '00') {
+                        echo "( ".$time[0]." hour and ".(int)((".".$time[1])*60). "min )"; 
+                    } else {
+                        echo "( ".$time[0]." hour )"; 
+                        }
+                    }  ?></span>
+    </div> 
+    <div>
+        <span><?php if ($helper['totalprice'] != '') { echo __('Total Price : ');?> </span>
+        <span><?php echo $currencySymbol->currency($helper['totalprice']); }?></span>
+    </div> 
+    <div>
+        <?php if ($helper['msg'] != '') { ?>
+        <span><?php echo $helper['msg']; } ?></span>
+    </div> 
+</div>
+<?php if ($helper['msg']=='') { ?>
+     <script>
+     	require([
+			'jquery',
+			"jquery/ui",
+		],
+	function ($){
+		$('#product-addtocart-button').prop('disabled',false);
+	});
+     </script>
+<?php } ?>
+

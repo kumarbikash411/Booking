@@ -1,0 +1,13 @@
+<?php 
+$bookingtype = $block->getBookingType(); 
+if ($bookingtype == 'Hotel Booking') {
+	 echo $this->getLayout()->createBlock('Ced\Booking\Block\FilterHotelRooms')->setData(['booking_type'=>$bookingtype])->setTemplate('Ced_Booking::product/view/filter_hotel_rooms.phtml')->toHtml();
+}
+if ($bookingtype == 'Daily Rent Booking') {
+    echo $this->getLayout()->createBlock('Ced\Booking\Block\Booking')->setData(['booking_type'=>$bookingtype])->setTemplate('Ced_Booking::product/view/booking_form_daily.phtml')->toHtml();
+} 
+if ($bookingtype == 'Hourly Rent Booking') {
+	 echo $this->getLayout()->createBlock('Ced\Booking\Block\Booking')->setData(['booking_type'=>$bookingtype])->setTemplate('Ced_Booking::product/view/booking_form_hourly.phtml')->toHtml();
+}
+
+?>

@@ -1,0 +1,46 @@
+<?php 
+$postData = $block->getData();
+$currencySymbol = $block->getCurrenySymbol();
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$helperdata = $this->_objectManager->create('Ced\Booking\Helper\BookingPrice')->getPrice($postData);
+?>
+<div>
+    <input type="hidden" name="total_price" value="<?php echo $helperdata['totalprice']; ?>" />
+    <input type="hidden" name="total_days" value="<?php echo $helperdata['totaldays']; ?>" />
+    <input type='hidden' name='available_rooms' id='available-rooms' value='<?php echo json_encode($helperdata['availablerooms']); ?>'>
+    <div>
+        <span><?php if ($helperdata['totaldays'] != '') { echo __('Total Days : ');?> </span>
+        <span><?php echo $helperdata['totaldays']; }?></span>
+    </div> 
+    <div>
+		<span><?php if ($helperdata['totalprice'] != '') { echo __('Total Price : ');?> </span>
+		<span><?php echo $currencySymbol->Currency($helperdata['totalprice']); }?></span>
+	</div>
+	<div>
+		<?php if ($helperdata['msg'] != '') :  ?>
+            <h5><?php echo $helperdata['msg'];?></h5>
+        <?php endif; ?>
+	</div>
+</div>
+<?php if ($helperdata['msg'] == '') { ?>
+     <script>
+     	require([
+			'jquery',
+			"jquery/ui",
+		],
+	function ($){
+		$('#product-addtocart-button').prop('disabled',false);
+	});
+     </script>
+<?php } else { ?>
+	 <script>
+     	require([
+			'jquery',
+			"jquery/ui",
+		],
+	function ($){
+		$('#product-addtocart-button').prop('disabled',true);
+	});
+     </script>
+<?php } ?>
+	

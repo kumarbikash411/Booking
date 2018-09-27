@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author      CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+?>
+<?php 
+	$amenities = $block->getAmenities();
+    $currentCategory = $block->getCurrentCategory();
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+    $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+                               ->getStore()
+                               ->getBaseUrl();
+    $searchProductUrl = $_baseUrl.'booking/booking/filterProductByAmenity';
+    $Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+
+    $isEnableSideFilter = $Datahelper->getStoreConfigValue('booking/Filter_setting/enable_side_filter');
+    $enableFilterValue = $Datahelper->getStoreConfigValue('booking/Filter_setting/side_filter_attribute');
+    $enableFilterArray = explode(',', $enableFilterValue);
+
+
+    $countProductCollection = count($block->getProductCollectionByCategory());
+?>
+<div class="block block-layered-nav filter">
+    <?php if ($isEnableSideFilter && $currentCategory && $countProductCollection!=0) : ?>
+    <strong class="block-subtitle filter-subtitle" role="heading">
+        <?php echo __('Browse By') ?>
+    </strong>
+    <div class="narrow-by-list">
+        <div class="ced-booking-sidebar-facility-filter filter-options-item">
+            <div class="ced-booking-sidebar-facility-filter-head filter-options-title" data-role="title" role="tab"><?php echo __('Facilities') ?></div>
+            <div class="ced-booking-sidebar-facility-filter-content filter-options-content" data-role="content" role="tabpanel" aria-hidden="true" style="display: none;">
+                <?php echo $block->getAmenitiesHtml($amenities);?>
+            </div>
+        </div>
+        <div class="ced-booking-sidebar-rating-filter filter-options-item">
+            <div class="ced-booking-sidebar-rating-filter-head filter-options-title" data-role="title" role="tab"><?php echo __('Star Rating') ?></div>
+            <div class="ced-booking-sidebar-rating-filter-content filter-options-content" data-role="content" role="tabpanel" aria-hidden="true" style="display: none;">
+                <?php echo $block->getStarRatingHtml();?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+</div>
+<script>
+
+		function filterProducts(element) 
+		{
+			if(element.checked == true)
+				window.location = element.value;
+			else if(element.checked == false)
+				window.location = element.getAttribute('data-uncheckurl');
+		}
+</script>
+<script>
+        require([
+        'jquery'
+        ],
+            function ($){
+
+                $('.ced-booking-sidebar-facility-filter').click(function(){
+
+                    if ($('.ced-booking-sidebar-facility-filter').hasClass('active'))
+                    {
+                        $('.ced-booking-sidebar-facility-filter').removeClass("active");
+                    } else {
+                        $('.ced-booking-sidebar-facility-filter').addClass("active");        
+                    }
+                });
+
+                $('.ced-booking-sidebar-rating-filter').click(function(){
+
+                    if ($('.ced-booking-sidebar-rating-filter').hasClass('active'))
+                    {
+                        $('.ced-booking-sidebar-rating-filter').removeClass("active");
+                    } else {
+                        $('.ced-booking-sidebar-rating-filter').addClass("active");        
+                    }
+                });
+            }
+        );
+</script>
+<style>
+    .ced-booking-sidebar-facility-filter.active .ced-booking-sidebar-facility-filter-content {
+        display: block !important;
+    }
+    .ced-booking-sidebar-rating-filter.active .ced-booking-sidebar-rating-filter-content {
+        display: block !important;
+    }
+    .vshop-left-cat-filter {
+        margin-left:10px;padding: 5px;
+    }
+</style>

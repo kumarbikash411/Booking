@@ -1,0 +1,76 @@
+
+<?php $item = $block->getOrderDetail(); ?>
+<table class="table dataTable booking-list-service" id="dynamic-table-xx">
+	<thead>
+		<tr>
+			<th colspan="1" rowspan="1" class="">
+				<a href="#"><?php echo __('Info Customer Shipping') ?></a>
+			</th>
+			<th colspan="1" rowspan="1" class="">
+				<a href="#"><?php echo __('Info booking Item') ?></a>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php if(count($item)) : ?>
+			<tr>
+				<td>
+				<?php //if($item['customer_address']) : ?>
+					<?php //$customerAddress = $item['customer_address']; ?>
+					<?php
+					?>
+					<?php echo __('Customer Name'); ?> : <?php echo $item['customer_firstname']. ' '. $item['customer_lastname']; ?><br/>
+					<?php echo __('Phone: '); ?> : <?php //echo $customerAddress->getTelephone(); ?><br/>
+					<?php echo __('Email: '); ?> : <?php echo $item['customer_email']; ?><br/>
+					<?php echo __('Address : '); ?> : <?php //echo $strSteets .', '.$customerAddress->getPostcode().','.$customerAddress->getCity().', '.$strCountry; ?><br/>
+				<?php //else : ?>
+					<span><?php //echo __('No Infor Shiiping'); ?></span>
+				<?php //endif; ?>
+				</td>
+				
+				<td>
+				<?php echo __('Booking Name'); ?> : <?php echo $item['name']; ?><br/>
+				<?php echo __('Price'); ?> : <?php echo $item['product_options']['info_buyRequest']['total_price']; ?><br/>
+				<?php echo __('Sku'); ?> : <?php echo $item['sku']; ?><br/>
+				<?php echo __('Check In'); ?> : <?php echo $item['product_options']['info_buyRequest']['selected_check_in']; ?><br/>
+				<?php echo __('check Out'); ?> : <?php echo $item['product_options']['info_buyRequest']['selected_check_out']; ?><br/>
+
+				<?php if(isset($item['product_options']['info_buyRequest']['booking_time_type']) && $item['product_options']['info_buyRequest']['booking_time_type'] == 'per_hour') : 
+
+				$from_t = $item['product_options']['info_buyRequest']['from_time_t']==1 ? 'am':'pm';
+				$from_h = $item['product_options']['info_buyRequest']['from_time_h'] >9 ? $item['product_options']['info_buyRequest']['from_time_h'] : '0'.$item['product_options']['info_buyRequest']['from_time_h']; 
+				$from_m = $item['product_options']['info_buyRequest']['from_time_m'] >9 ? $item['product_options']['info_buyRequest']['from_time_m'] : '0'.$item['product_options']['info_buyRequest']['from_time_m']; 
+
+				$from_time  = $from_h.':'.$from_m.' '.$from_t;
+
+				$to_t = $item['product_options']['info_buyRequest']['to_time_t']==1 ? 'am':'pm';
+				$to_h = $item['product_options']['info_buyRequest']['to_time_h'] >9 ? $item['product_options']['info_buyRequest']['to_time_h'] : '0'.$item['product_options']['info_buyRequest']['to_time_h']; 
+				$to_m = $item['product_options']['info_buyRequest']['to_time_m'] >9 ? $item['product_options']['info_buyRequest']['to_time_m'] : '0'.$item['product_options']['info_buyRequest']['to_time_m']; 
+
+				$to_time  = $to_h.':'.$to_m.' '.$to_t;
+
+				?>
+
+				<?php echo __('Service Start'); ?> : <?php echo $from_time; ?><br/>
+				<?php echo __('Service End'); ?> : <?php echo $to_time; ?><br/>
+
+				<?php endif; ?>
+					
+				
+				<?php if(isset($item['product_options']['info_buyRequest']['total_days']) && $item['product_options']['info_buyRequest']['total_days'] > 0) : ?>
+
+					<?php echo __('Total Days'); ?> : <?php echo $item['product_options']['info_buyRequest']['total_days']; ?><br/>
+
+				<?php endif; ?>
+
+				<?php if(isset($item['product_options']['info_buyRequest']['total_hours']) && $item['product_options']['info_buyRequest']['total_hours'] > 0) : ?>
+
+					<?php echo __('Total Hours'); ?> : <?php echo $item['product_options']['info_buyRequest']['total_hours']; ?><br/>
+
+				<?php endif; ?>
+				<?php echo __('Qty'); ?> : <?php echo $item['product_options']['info_buyRequest']['selected_qty']; ?><br/>
+				</td>
+			</tr>
+		<?php endif; ?>
+	</tbody>
+</table>

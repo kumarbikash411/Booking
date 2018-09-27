@@ -1,0 +1,152 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\ConfigurableProduct\Block\Adminhtml\Product\Edit\Tab\Variations\Config\Matrix */
+?>
+<?php
+$productMatrix = $block->getProductMatrix();
+$attributes = $block->getProductAttributes();
+$currencySymbol = $block->getCurrencySymbol();
+?>
+<div class="<?= /* @noEscape */ $block->getData('config/dataScope') ?>" data-role="step-wizard-dialog" data-bind="scope: '<?= /* @noEscape */ $block->getForm() ?>.<?= /* @noEscape */ $block->getModal() ?>'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+<div class="<?= /* @noEscape */ $block->getData('config/dataScope') ?>" id="product-variations-matrix" data-role="product-variations-matrix">
+    <div data-bind="scope: 'configurableVariations'"></div>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "<?= /* @noEscape */ $block->getData('config/form') ?>.<?= /* @noEscape */ $block->getModal() ?>": {
+                        "component": "Ced_Booking/js/components/modal-Booking",
+                        "options": {"type": "slide", "title": "<?php echo $block->escapeHtml(__('Create Rooms')); ?>"},
+                        "formName": "<?= /* @noEscape */ $block->getForm() ?>",
+                        "isTemplate": false,
+                        "stepWizard": "<?= /* @noEscape */ $block->getData('config/nameStepWizard') ?>",
+                        "children": {
+                            "wizard": {
+                                "url": "<?= /* @noEscape */ $block->getUrl($block->getData('config/urlWizard'), ['id' => $block->getProduct()->getId()]) ?>",
+                                "component": "Magento_Ui/js/form/components/html"
+                            }
+                        }
+                    },
+                    "<?= /* @noEscape */ $block->getData('config/form') ?>.configurableVariations": {
+                        "component": "Magento_ConfigurableProduct/js/variations/variations",
+                        "provider": "<?= /* @noEscape */ $block->getProvider() ?>",
+                        "dataScopeVariations": "variations",
+                        "dataScopeAttributes": "data.attributes",
+                        "dataScopeAttributeCodes": "data.attribute_codes",
+                        "dataScopeAttributesData": "data.product.configurable_attributes_data",
+                        "formName": "<?= /* @noEscape */ $block->getForm() ?>",
+                        "attributeSetHandler": "<?= /* @noEscape */ $block->getForm() ?>.configurable_attribute_set_handler_modal",
+                        "wizardModalButtonName": "<?= /* @noEscape */ $block->getForm() ?>.modaljs.add_room_button.create_add_rooms_button",
+                        "wizardModalButtonTitle": "<?php echo $block->escapeHtml(__('Edit Configurations')); ?>",
+                        "productAttributes": <?= /* @noEscape */ $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($attributes) ?>,
+                        "productUrl": "<?= /* @noEscape */ $block->getUrl('catalog/product/edit', ['id' => '%id%']) ?>",
+                        "variations": <?= /* @noEscape */ $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($productMatrix) ?>,
+                        "currencySymbol": "<?= /* @noEscape */ $currencySymbol ?>",
+                        "attributeSetCreationUrl": "<?= /* @noEscape */ $block->getUrl('*/product_set/save') ?>"
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script>
+    require(['jquery', 'mage/apply/main'], function ($, main) {
+        main.apply();
+        $('.<?= /* @noEscape */ $block->getData('config/dataScope') ?>[data-role=step-wizard-dialog]').applyBindings();
+        $('.<?= /* @noEscape */ $block->getData('config/dataScope') ?>[data-role=product-variations-matrix]').applyBindings();
+    })
+</script>
+<script>
+require([
+        'jquery'  
+        ],
+        function($) {
+
+            var checkAttributeSet = setInterval(function() {
+
+                if ($('[data-index="booking-general-information"]').length>0)
+                {
+                    if ($('[data-role="selected-option"]').text() != 'Daily Rent Booking' && $('[data-role="selected-option"]').text() != 'Hourly Rent Booking' 
+                        && $('[data-role="selected-option"]').html() != 'Hotel Booking')
+                    {
+                        $('[data-index="booking-general-information"]').hide();
+                        $('[data-index="booking"]').hide();
+                    } else {
+                        $('[data-index="booking-general-information"]').show();
+                        $('[data-index="booking"]').show();
+                    }
+                    clearInterval(checkAttributeSet);
+                }
+
+            },1000);
+           
+            var checkHotelServiceExist = setInterval(function() {
+
+                    if ($('[data-index="booking_check_in_time"]').length > 0 && $('[data-index="booking_check_out_time"]').length > 0) {
+
+                        $('[data-index="booking_check_in_time"] div input').timepicker({
+
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true
+                                                        
+                        });
+
+                        $('[data-index="booking_check_out_time"] div input').timepicker({
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true
+                                                        
+                        });
+                        clearInterval(checkHotelServiceExist);
+                    }
+                  
+                }, 1000); 
+
+             var checkDailyServiceExist = setInterval(function() {
+
+                    if ($('[data-index="booking_service_start"]').length > 0 && $('[data-index="booking_service_end"]').length > 0) {
+
+                        $('[data-index="booking_service_start"] div input').timepicker({
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true
+                                                        
+                        });
+                        $('[data-index="booking_service_end"] div input').timepicker({
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true                      
+                        });
+                     clearInterval(checkDailyServiceExist);
+                   }
+                   
+                }, 1000); 
+
+              var checkHourlyServiceExist = setInterval(function() {
+
+                   if ($('[data-index="service_start_time"]').length >0 && $('[data-index="service_end_time"]').length > 0) {
+
+                        $('[data-index="service_start_time"] div input').timepicker({
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true
+                                                        
+                        });
+                        $('[data-index="service_end_time"] div input').timepicker({
+                                'timeFormat': 'hh:mm tt',
+                                'ampm': true                        
+                        });
+                    clearInterval(checkHourlyServiceExist);
+                   }
+                   
+                }, 1000); 
+            
+});
+</script>
+

@@ -1,0 +1,76 @@
+<?php 
+$bookingid = $block->getBookingId(); 
+$bookingsku = $block->getSku(); 
+$bookingtype = $block->getBookingType();
+$bookingcurrentdate = $block->getbookingcurrentdate();
+$currencysymbol = $block->getcurrencysymbol();
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+$_calendarUrl = $_baseUrl.'admin/booking/calendar/calendar';
+$_calendareditUrl = $_baseUrl.'admin/booking/calendar/calendaredit';
+?>
+<div id="booking-calendar"></div>
+<script>
+		require([
+			'jquery',
+			'booking_calendar'
+		],
+		function($, bookingCalendar) {
+			var bookingId = '<?php echo $bookingid; ?>'
+			var bookingType = '<?php echo $bookingtype; ?>';
+			var bookingCurrentDate = '<?php echo $bookingcurrentdate; ?>';
+			var bookingSymbol = '$';//'<?php echo $currencysymbol; ?>';
+			var bookingsku = '<?php echo $bookingsku; ?>';
+			var objData = {
+				'DataURL' : '<?php echo $_calendarUrl; ?>',
+				'booking_id': bookingId,
+				'booking_type' : bookingType,
+				'booking_sku' : bookingsku,
+				'currency': bookingSymbol,
+				'url_add_item' : '<?php echo $_calendareditUrl; ?>',
+				'str_current_date': bookingCurrentDate,
+				'obj_status_text' : {
+					'available': '<?php echo __('Available'); ?>',
+					'special': '<?php echo __('Available'); ?>',
+					'block': '<?php echo __('Block'); ?>',
+					'unavailable': '<?php echo __('Unavailable'); ?>',
+					'booked': '<?php echo __('Booked'); ?>',
+				},
+				'name_day_th' : [
+											'<?php echo __('Sunday'); ?>',
+											'<?php echo __('Monday'); ?>',
+											'<?php echo __('Tuesday'); ?>',
+											'<?php echo __('Wednesday'); ?>',
+											'<?php echo __('Thursday'); ?>',
+											'<?php echo __('Friday'); ?>',
+											'<?php echo __('Saturday'); ?>'
+									],
+				'name_day_short_th' : [
+												'<?php echo __('Mon'); ?>',
+												'<?php echo __('Tue'); ?>',
+												'<?php echo __('Wed'); ?>',
+												'<?php echo __('Thu'); ?>',
+												'<?php echo __('Fri'); ?>',
+												'<?php echo __('Sat'); ?>',
+												'<?php echo __('Sun'); ?>'
+											],
+				'name_day_shortest_th' : [
+											'<?php echo __('Su'); ?>',
+											'<?php echo __('Mo'); ?>',
+											'<?php echo __('Tu'); ?>',
+											'<?php echo __('We'); ?>',
+											'<?php echo __('Th'); ?>',
+											'<?php echo __('Fi'); ?>',
+											'<?php echo __('Sa'); ?>',
+											],
+				'add_text' : '<?php echo __('Add'); ?>',
+				'remove_text' : '<?php echo __('Remove'); ?>',
+				'next_text' : '<?php echo __('Next'); ?>',
+				'pre_text' : '<?php echo __('Pre'); ?>',
+			};
+			$('#booking-calendar').CedAnyBooking(objData);
+		})
+	</script>

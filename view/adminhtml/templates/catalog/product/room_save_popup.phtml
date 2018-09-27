@@ -1,0 +1,384 @@
+<?php
+
+$room = $this->getRooms();
+//$roomTypes = $this->getRoomTypes();
+$childrooms = $block->getChildRooms()->getData();
+//print_r($childrooms); die;
+$jsonencoderoomdata = json_encode($childrooms);
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+
+		$_ProductroomsaveUrl = $_baseUrl.'admin/booking/productsave/productroomsave';
+		$_UploadroomImageUrl = $_baseUrl.'admin/booking/productsave/roomimagesave';
+$sku=$this->getData('sku');
+$product_id = $this->getRequest()->getParam('product_id');
+$roomId = false;
+$newaddreq = $this->getData('newaddreq'); // For new Add rooom Check
+
+if($newaddreq == 1){
+	$maxAdult = '0';
+	$maxChild = '0';
+	$maxDays = '0';
+	$minDays ='0';
+	$position ='0';
+	$status = '1';
+	$qty = '0';
+	$description = '';
+}else{
+	$roomId = $this->getData('room_id');
+	$rooms = $block->getRoomsById($roomId);
+	//print_r($rooms->getData()); die;
+	$roomType = $rooms->getRoomType();
+	$maxAdult = $rooms->getRoomMaxAdults();
+	$maxChild = $rooms->getRoomMaxChildren();
+	$maxDays = $rooms->getRoomMaximumDay();
+	$minDays = $rooms->getRoomMinimumDay();
+	$position = $rooms->getRoomPosition();
+	$status = $rooms->getRoomStatus();
+	$qty = $rooms->getRoomQuantity();
+	$description = $rooms->getRoomDesc();
+	// for edit case
+}
+
+
+/*foreach($room as $rooms)
+if($rooms->getRoomId())
+{
+	$roomId = $rooms->getRoomId();
+	$roomType = $rooms->getRoomType();
+	$maxAdult = $rooms->getRoomMaxAdults();
+	$maxChild = $rooms->getRoomMaxChildren();
+	$maxDays = $rooms->getRoomMaximumDay();
+	$minDays = $rooms->getRoomMinimumDay();
+	$position = $rooms->getRoomPosition();
+	$status = $rooms->getRoomStatus();
+	$qty = $rooms->getRoomQuantity();
+	$description = $rooms->getRoomDesc();
+	//$useDefault = isset($arDesText['use_default']) ? $arDesText['use_default'] : 1;
+	
+}*/
+
+$useDefault =0;
+//$roomTypeOfHotel = $block->getRoomTypeOfHotel($roomBookingId,$roomId);
+//date for tab price
+$calendardatasend = ['booking_id'=>$roomId, 'booking_type'=>'hotel']; // for edit case
+?>
+<div id="booking-light-box" value="<?php print_r($newaddreq);?>">
+	<div class="booking-popup-header">
+		<button id="room-save-action" class="primary" style="float: right" type="button"><?php echo __('Save'); ?></button> 
+	</div>
+	<div class="booking-popup-header">
+		<button id="room-facilities-action" class="primary" style="float: right" type="button"><?php echo __('Assign Facilities'); ?></button> 
+	</div>	
+	<div class="booking-popup-header">
+		<button id="room-price-action" class="primary" style="float: right" type="button"><?php echo __('Setup Price'); ?></button> 
+	</div>	
+	<div>
+		<form id="hotel_room_form" method="post" enctype="multipart/form-data" action="/">
+		<input type="hidden" value="<?php echo $this->getFormkey(); ?>" name="form_key"></input>
+		<input type="hidden" value="<?php echo $product_id; ?>" name="product_id">
+		<input type="hidden" name="room_product_sku" value="<?php echo $sku; ?>" />
+		<input type="hidden" name="image" value="" id="booking_room_image" />
+			<div class="admin__field _required">
+	   			<label class="admin__field-label"><span>Room Category</span></label>
+	    		<div class="admin__field-control">
+	    			<select class="admin__control-select" id="room-type-id" name="room_type">
+	    				<option value="">Select Room Type</option>
+							<?php if(count($childrooms)) : ?>
+							<?php foreach($childrooms as $key=>$value) : ?>
+							<option <?php if(isset($rooms) && $rooms->getRoomType() == $value['room_category']) {
+									echo 'selected="selected"'; } ?> 
+									value="<?php echo $value['room_category']; ?>"><?php echo $value['room_category']; ?>
+							</option>
+							<?php endforeach; ?>
+							<?php endif;?>
+	    			</select>
+				</div>
+			</div>
+			<div class="admin__field _required" id="room-child-field">
+				
+			</div>
+			<div class="admin__field">
+	   			<label class="admin__field-label"><span>Status</span></label>
+	    		<div class="admin__field-control">
+	    			<select class="admin__control-select" name="room_status">
+	    				<option value="1"><?php echo __('Enable'); ?></option>
+                        <option <?php if($status == '2') echo 'selected="selected"'; ?> value="2"><?php echo __('Disable') ?></option>
+	    			</select>
+				</div>
+			</div>
+			<div class="admin__field">
+	   			<label class="admin__field-label"><span>Max Children</span></label>
+	    		<input type="text" class="admin__control-text" placeholder="" name="room_max_children" value="<?php echo $maxChild; ?>">
+			</div>
+			<div class="admin__field">
+	   			<label class="admin__field-label"><span>Max Adults</span></label>
+	    		<input type="text" class="admin__control-text" placeholder="" name="room_max_adults" value="<?php echo $maxAdult; ?>">
+			</div>
+			<div class="admin__field">
+	   			<label class="admin__field-label"><span>Description</span></label>
+	    		<textarea id="room-description" name="room_desc" placeholder="Enter room description"><?php echo $description; ?></textarea>
+			</div>
+			<div class="admin__field">
+	   			<label class="admin__field-label"><span>Room Images</span></label>
+	   			<input id="hotel_room_image" type="file" name="room_image">
+	   			<div class="room-image">
+	   			<?php //echo $_baseUrl.'pub/media/images/'.$rooms->getRoomImages(); ?>
+					<img width="180" height="180" src="<?php if(isset($rooms)) { echo $_baseUrl.'pub/media/images/'.$rooms->getRoomImages(); } ?>" />
+				</div>
+	    		<!-- <?php //echo $this->getLayout()->createBlock('Ced\Booking\Block\Adminhtml\RoomsImage')->setData(['room_id'=>$roomId])->setTemplate('Ced_Booking::catalog/product/rooms/rooms_image.phtml')->toHtml(); ?> -->
+			</div>
+		</form>
+<script>
+require([
+	'jquery',
+	'Magento_Ui/js/modal/alert',
+],function($,alert){
+	/* tab selection */
+    $(".booking-tabs-menu a").click(function(event) {
+        event.preventDefault();
+        $(this).parent().addClass("current");
+        $(this).parent().siblings().removeClass("current");
+        var tab = $(this).attr("href");
+        $(".booking-tab-content").not(tab).css("display", "none");
+        $(tab).fadeIn();
+    });	
+	
+	var roomBookingId = '<?php //echo $roomBookingId; ?>';
+	var roomId = '<?php echo $roomId; ?>';
+	var roomSaveUrl = '<?php echo $_ProductroomsaveUrl; ?>';
+	var newOptionUrl = '<?php //echo $newOptionUrl; ?>';
+	var newDiscountUrl = '<?php //echo $newDiscountUrl; ?>';
+	var uploadImageUrl = '<?php echo $_UploadroomImageUrl; ?>';
+	var storeId = '<?php //echo $storeId; ?>';
+	//save booking rooms
+	$('#room-save-action').click(function(e){
+		$('.booking-loading-mask').css('display','block');
+		var roomType = $('#room-type-id').val();
+
+		var data = new FormData($('#hotel_room_form')[0]);
+
+		e.preventDefault();
+
+		if($.trim(roomType) == '')
+		{
+			alert({
+					title: '<?php echo __('Note: ') ?>',
+					content: '<?php echo __('Please Select room Category!') ?>'
+				});
+			return false;
+		}
+	
+		$.ajax({
+			url : roomSaveUrl,
+			dataType : 'json',
+			type : 'POST',
+			showLoader: true,
+			data : data,
+			async: false,
+	 		cache: false,
+	 		contentType: false,
+	 		processData: false,
+			success : function(res)
+			{
+				var strMessage = '<?php echo __('Room have been saved success'); ?>';
+				if(res.status == false)
+				{
+					strMessage = '<?php echo __('System are errors, Please check again!'); ?>'
+				}
+
+				if (res.flag == 0) {
+					alert({
+						title: 'Status',
+						content: res.mesg
+				    });
+				    $('.tabs').hide();
+				    return false;
+				} else {
+					alert({
+						title: 'Status',
+						content: res.mesg
+				    });
+				}
+				
+				$('.booking-loading-mask').css('display','none');
+			},
+			error : function()
+			{
+				alert({
+					title: 'Error Message',
+					content: '<?php echo __('System are errors, Please check again!') ?>'
+				});
+				$('.booking-loading-mask').css('display','none');
+			}
+		});
+	});
+
+	//upload image
+	// $('#booking-room-image').on("change",function(e){
+	// 	var formData = new  FormData($('#room_save_form')[0]);
+	// 	$('.booking-loading-mask').css('display','block');
+	//     e.preventDefault();
+	// 	$.ajax({
+	// 		url : uploadImageUrl,
+	// 		dataType : 'json',
+	// 		type : 'POST',
+	// 		data : formData,
+	// 		async: false,
+	// 		cache: false,
+	// 		contentType: false,
+	// 		processData: false,
+	// 		showLoader: true,
+	// 		success : function(res)
+	// 		{
+	// 			if(res.status == true)
+	// 			{
+	// 				alert({
+	// 					title: '',
+	// 					content: res.mesg
+	// 				});
+	// 				$('#booking-room-list-images').html(res.html_images)
+	// 			}
+	// 			else
+	// 			{
+	// 				alert({
+	// 					title: '',
+	// 					content: '<?php echo __('System are errors, Please check again!') ?>'
+	// 				});
+	// 			}
+	// 			$('.booking-loading-mask').css('display','none');
+	// 		},
+	// 		error : function()
+	// 		{
+	// 			alert({
+	// 				title: '',
+	// 				content: '<?php echo __('System are errors, Please check again!') ?>'
+	// 			});
+	// 			$('.booking-loading-mask').css('display','none');
+	// 		}					
+	// 	})
+	// });
+	//addons & sells
+	$('#booking-room-add-option').click(function(){
+		$('.booking-loading-mask').css('display','block');
+		$.ajax({
+			url : newOptionUrl,
+			dataType : 'json',
+			showLoader: true,
+			type : 'POST',
+			data : {store_id : storeId, kind_of_option : 'hotel'},
+			success : function(res)
+			{
+				$('#booking-room-options-content').append(res.html_option);
+				$('.booking-loading-mask').css('display','none');
+			},
+			error : function()
+			{
+				
+			}
+		}); 
+	});
+	//add discount
+	$('#booking-room-add-discount').click(function(){
+		$('.booking-loading-mask').css('display','block');
+		$.ajax({
+			url : newDiscountUrl,
+			dataType : 'json',
+			showLoader: true,
+			type : 'POST',
+			data : {kind_of_discount : 'hotel'},
+			success : function(res)
+			{
+				$('#booking-room-discounts-content').append(res.html_discount);
+				$('.booking-loading-mask').css('display','none');
+			},
+			error : function()
+			{
+				
+			}
+		}); 
+	})
+	$('#des-use-default').click(function(){
+		if($(this).is(":checked"))
+		{
+			$('#room-description').prop('disabled',true);
+		}
+		else
+		{
+			$('#room-description').prop('disabled',false);
+		}
+	})
+
+	var roomdata = '<?php echo $jsonencoderoomdata; ?>';
+	if ($('#room-type-id').val() != '') {
+
+			var childroom = '<?php if(isset($rooms)) echo $rooms['child_room_type'];?>';
+
+			$('#room-child-field').show();
+			var selectlist = '<label class="for_title">Room Type</label>';
+
+		      selectlist += "<select name='child_room_type'>";
+
+		    var result = $.parseJSON(roomdata);
+			if(result.length>0)
+			{ 
+			    for (var i=0 ; i<result.length; i++) {
+			    	var objroomcat = result[i]['room_category'];
+			    	var objroomtitle = result[i]['roomtype_title'];
+
+			    	if (objroomcat == $('#room-type-id').val()) {
+
+			    		//if(childroom == objroomtitle) {
+ 
+			    			selectlist += "<option if("+childroom+" == "+objroomtitle+") { selected } >" +objroomtitle + "</option>";
+			    		//}else {
+			    			//selectlist += "<option selected>" +objroomtitle + "</option>";
+			    		//}	
+			    	} 
+			    }
+			}
+		    selectlist += "</select>";
+	        $('#room-child-field').html(selectlist);
+			
+		}
+
+
+// <label class=""><span>Room Category</span></label>
+// 	    		<div class="admin__field-control" id="room-child-field">
+// 	    		</div>
+	$('#room-type-id').on('change', function() {
+
+		if ($('#room-type-id').val() != '') {
+
+			$('#room-child-field').show();
+
+			var selectlist = '<label><span>Room Type</span></label>';
+
+				selectlist += '<div class="admin__field-control" id="room-child-field">';
+
+		      	selectlist += "<select name='child_room_type' class='admin__control-select'>";
+
+		    var result = $.parseJSON(roomdata);
+			if(result.length>0)
+			{ 
+			    for (var i=0 ; i<result.length; i++) {
+			    	var objroomcat = result[i]['room_category'];
+			    	var objroomtitle = result[i]['roomtype_title'];
+
+			    	if (objroomcat == $('#room-type-id').val()) {
+
+			    		selectlist += "<option>" + objroomtitle + "</option>";	
+			    	} 
+			    }
+			}
+		    selectlist += "</select></div>";
+	        $('#room-child-field').html(selectlist);
+	    } else {
+	    	 $('#room-child-field').hide();
+	    }
+   })
+})
+
+</script>

@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/* @var $block \Magento\ConfigurableProduct\Block\Adminhtml\Product\Steps\Bulk */
+?>
+
+<div data-bind="scope: '<?= /* @noEscape */  $block->getComponentName()?>'" data-role="bulk-step">
+    <h2 class="steps-wizard-title"><?php echo $block->escapeHtml(__('Step 3: Bulk Images, Price and Quantity')); ?></h2>
+    <div class="steps-wizard-info">
+        <?php /* @escapeNotVerified */ echo __('Based on your selections %1 new products will be created. Use this step to customize images and price for your new products.', '<span class="new-products-count" data-bind="text:countVariations"></span>') ?>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "<?= /* @noEscape */  $block->getComponentName()?>": {
+                    "component": "Ced_Booking/js/variations/steps/exclude_days",
+                    "appendTo": "<?= /* @noEscape */  $block->getParentComponentName()?>",
+                    "variationsComponent": "<?= /* @noEscape */ $block->getData('config/form') ?>.configurableVariations"
+                }
+            }
+        }
+    }
+}
+</script>

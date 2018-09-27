@@ -1,0 +1,56 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/* @var $block  */
+$facilities = $block->getRoomFacilities();
+?>
+<div class="select-attributes-block <?= /* @noEscape */ $block->getData('config/dataScope') ?>" data-role="select-attributes-step">
+    <!-- <div class="select-attributes-actions" data-type="skipKO">
+        <?= /* @noEscape */  $block->getAddNewAttributeButton(); ?>
+    </div> -->
+    <h2 class="steps-wizard-title"><?php echo $block->escapeHtml(
+            __('Step 1: Select Room Facilities')
+        ); ?></h2>
+    <div class="selected-attributes" data-bind="scope: '<?= /* @noEscape */  $block->getComponentName()?>'">
+        <?php echo $block->escapeHtml(
+            __('Selected Facilities:')
+        ); ?>
+      
+    </div>
+
+    <!-- <?php if (count($facilities) != 0 ) { 
+        foreach ($facilities as $facility) { ?>
+
+            <span><?php echo $facility->getTitle(); ?></span>
+            <div data-role="switcher" class="admin__actions-switch">
+                <input type="checkbox" class="admin__actions-switch-checkbox" id="<?php echo $facility->getId()?>" name="room[facility]" value="1">
+                <label class="admin__actions-switch-label"  for="<?php echo $facility->getId()?>">
+                    <span class="admin__actions-switch-text"  data-text-on="Yes" data-text-off="No"></span>
+                </label>
+            </div>
+
+    <?php } } ?> -->
+<?= $block->getChildHtml(); ?>
+    
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "<?= /* @noEscape */  $block->getComponentName()?>": {
+                        "component": "Ced_Booking/js/variations/steps/room_facilities",
+                        "appendTo": "<?= /* @noEscape */  $block->getParentComponentName()?>"
+                    }
+                }
+            }
+        }
+    }
+</script>
+

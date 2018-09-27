@@ -1,0 +1,91 @@
+<?php $data = $block->getRentProduct();
+	  $post = $this->getPost();
+
+	  $postdata = [];
+	  if (count($post)!=0) {
+	  	foreach ($data as $val) {
+	  		if (strtolower($post['address']) == strtolower($val['city'])) {
+
+	  			$postdata[] = $val;
+
+	  		}
+	  	}
+	  } 
+?>
+<div class="product-listing">
+	<?php if (count($post)==0) {
+	foreach ($data as $value) { ?>
+	<div>
+		<div>
+			<?php if ($value['image']=='') { ?>
+			<div class="booking-image">
+				<a class="img" data-toggle="modal" data-target="#room"> 
+					<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg') ; ?>"
+					width="185" />
+				</a>
+			</div>
+			<?php } else { ?>
+				<div class="booking-image">
+					<a class="img" data-toggle="modal" data-target="#room"> 
+						<img src="<?php echo $block->getUrl().'pub/media/catalog/product'.$value['image']; ?>"
+						width="185" />
+					</a>
+				</div>
+			<?php } ?>
+		</div>
+		<div>
+			<div class="name-book">
+				<a href="" class="product-name"><?php echo $value['name'];?></a>
+			</div>
+		</div>
+		<div>
+			<div>
+				<div>
+					<a href="<?php echo $value['product_url'];?>" class="book-btn"><?php echo __('Book Now'); ?></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php } } else { 
+
+	if (count($postdata)!=0) {
+
+	foreach ($postdata as $value) { ?>
+	<div>
+		<div>
+			<?php if ($value['image']=='') { ?>
+			<div class="booking-image">
+				<a class="img" data-toggle="modal" data-target="#room"> 
+					<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg') ; ?>"
+					width="185" />
+				</a>
+			</div>
+			<?php } else { ?>
+				<div class="booking-image">
+					<a class="img" data-toggle="modal" data-target="#room"> 
+						<img src="<?php echo $block->getUrl().'pub/media/catalog/product'.$value['image']; ?>"
+						width="185" />
+					</a>
+				</div>
+			<?php } ?>
+		</div>
+		<div>
+			<div class="name-book">
+				<a href="" class="product-name"><?php echo $value['name'];?></a>
+			</div>
+		</div>
+		<div>
+			<div>
+				<div>
+					<a href="<?php echo $value['product_url'];?>" class="book-btn"><?php echo __('Book Now'); ?></a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<?php } } else { ?>
+
+	<div><?php echo __('Booking Not Found'); ?></div>
+
+	<?php	} } ?>
+</div>

@@ -1,0 +1,204 @@
+<?php
+
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the 
+ * You can check the licence at this URL: http://cedcommerce.com/license-agreement.txt
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author 		CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+?>
+<div class="panel panel-default">
+	<div class="panel-heading" style="margin:0">
+		<i class="fa fa-calendar-o"></i> <?php echo __('Booking Calendar'); ?>
+	</div>
+	<div class="panel-body">
+	<div id='booking_calendar'></div>
+	</div>
+</div>
+
+
+<div id="popup-modal" style="display: none;">
+<div id="eventContent" title="Event Details" >
+    Start: <span id="startTime"></span><br>
+    End: <span id="endTime"></span><br><br>
+    <p id="eventInfo"></p>
+    <p><strong><a id="eventLink" href="" target="_blank">Read More</a></strong></p>
+
+   	<ul class="list-group">
+   	 <li class="list-group-item">
+	  	<div class="row">
+	  		<div class="col-sm-4"><?php echo __('# Order'); ?></div>
+	  		<div class="col-sm-8" id="booking_order"></div>
+	  	</div>
+	  </li>
+	  <li class="list-group-item">
+	  	<div class="row">
+	  		<div class="col-sm-4"><?php echo __('Product'); ?></div>
+	  		<div class="col-sm-8" id="product_details"></div>
+	  	</div>
+	  </li>
+	  <li class="list-group-item">
+	  	<div class="row">
+	  		<div class="col-sm-4"><?php echo __('Booking From'); ?></div>
+	  		<div class="col-sm-8" id="booking_from"></div>
+	  	</div>
+	  </li>
+	  <li class="list-group-item">
+	  	<div class="row">
+	  		<div class="col-sm-4"><?php echo __('Booking To'); ?></div>
+	  		<div class="col-sm-8" id="booking_to"></div>
+	  	</div>
+	  </li>
+	  <li class="list-group-item">
+	  	<div class="row">
+	  		<div class="col-sm-4"><?php echo __('Qty'); ?></div>
+	  		<div class="col-sm-8" id="booking_qty"></div>
+	  	</div>
+	  </li>
+	  
+	</ul>
+
+
+</div>
+</div>
+
+
+<div id="booking-popup-modal" style="display: none"></div>
+
+
+<?php 
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+$formKey = $objectManager->get('Magento\Framework\Data\Form\FormKey')->getFormKey(); 
+?>
+
+
+<script>
+
+require([
+    'jquery',
+    'ced_fullcalendar',
+    'ced_moment',
+    "Magento_Ui/js/modal/modal"
+    ], function($, fullCalendar, moment, modal){ 
+
+
+
+	    $('#booking_calendar').fullCalendar({
+		    eventSources: [
+		        {       
+		            url: '<?php echo $this->getUrl('booking/dashboard/bookingStatusCalendar'); ?>?isAjax=true&form_key=<?php echo $formKey; ?>',
+		            type: 'POST',
+		            showLoader: true,
+		            cache: true,
+		            error: function() {
+		                alert('there was an error while fetching events!');
+		            },
+		            
+		        }
+		    ],
+		    header: {
+		        left: '',
+		        center: 'prev title next',
+		        right: ''
+		    },
+		   	/*eventClick: function(event) {
+	            var modal = $("#modal");
+	            modal.find(".modal-title").html(event.title);
+	            modal.modal();
+	        }*/
+	          eventClick: function(event) {
+
+	          	
+
+
+	          	$.ajax({
+					url : '<?php echo $this->getUrl('booking/dashboard/bookingDetails'); ?>',
+					dataType : 'json',
+					type : 'POST',
+					data : {order_id : event.booking_order_id,order_type:event.order_type,form_key:'<?php echo $formKey; ?>'},
+					showLoader: true,
+					success : function(res)
+					{
+						$('#booking-popup-modal').css('display','block');
+						$('#booking-popup-modal').html(res.template);
+						var options = {
+			               // type: 'slide',
+			                responsive: true,
+			                innerScroll: true,
+			                title: 'Booking Details',
+			                buttons: [{
+			                	text: $.mage.__('Close'),
+                            	class: 'modal-btn',
+			                    click: function () {
+			                        this.closeModal();
+			                    }
+			                }]
+		            	};
+						//$('#booking-popup-modal').trigger('contentUpdated');
+
+		            	var popup = modal(options, $('#booking-popup-modal'));
+
+		            	$('#booking-popup-modal').modal('openModal');
+					},
+					error : function()
+					{
+						
+					}
+				}); 
+
+
+
+	          	/*
+           		 var options = {
+                        type: 'popup',
+                        responsive: true,
+                        innerScroll: true,
+                        title: 'Booking Details',
+                        buttons: [{
+                            text: $.mage.__('Close'),
+                            class: 'modal-btn',
+                            click: function() {
+                                this.closeModal();
+                            }
+                        }]
+                    };
+
+                   	$("#booking_order").html(event.order_id);
+					$("#product_details").html(event.product_name);
+					$("#booking_from").html(event.start);
+					$("#booking_to").html(event.end);
+					$("#booking_qty").html(event.qty);
+
+                    var popup = modal(options, $('#popup-modal'));
+
+                    $('#popup-modal').modal('openModal');*/
+        	}
+		});
+
+
+
+
+
+
+
+
+
+    
+  });
+
+</script>
+<style>	
+	#booking_calendar a .fc-content{
+		color: #fff;
+	}
+</style>

@@ -1,0 +1,121 @@
+<?php $roomOrderdata = $block->getroomOrderItems();
+      $rentOrderdata = $block->getrentOrderItems();
+      $bookedRoomNumbers = $block->getBookedRoomNumbers();
+      //  print_r($roomOrderdata->getData()); 
+       // print_r($rentOrderdata->getData()); die;
+      if (count($roomOrderdata)!=0 && count($rentOrderdata)!=0) {
+
+            $orderData = array_merge($roomOrderdata->getData(),$rentOrderdata->getData());
+
+      } elseif (count($roomOrderdata)!=0) {
+            $orderData =  $roomOrderdata->getData();
+      } elseif (count($rentOrderdata)!=0) {
+       $orderData =  $rentOrderdata->getData();
+      }
+?>
+<section class="admin__page-section">
+    <div class="admin__page-section-title">
+        <span class="title">Items Detail</span>
+    </div>
+    <div class="admin__table-wrapper">
+    <table class="data-table admin__table-primary edit-order-table">
+        <thead>
+            <tr class="headings">
+                <th class="col-product"><span>Product Name</span></th>
+                <th class="col-room-type"><span>Type</span></th>
+                <th class="col-total-days"><span>Total Days</span></th>
+                <th class="col-check-in"><span>Check In</span></th>
+                <th class="col-check-out"><span>Check Out</span></th>
+                <th class="col-quantity"><span>Quantity</span></th>
+                <!-- <th class="col-quantity"><span>Room Numbers</span></th> -->
+            </tr>
+        </thead>
+        <tbody class="even">
+                <?php if(isset($orderData) && count($orderData)!=0) :  $repeat= false;
+                    foreach ($orderData as $item) :
+
+                        if (isset($startdate) && isset($enddate) && $startdate == $item['booking_start_date'] && $enddate == $item['booking_end_date']) { 
+
+                            $repeat = true;
+                        }
+                    
+                     ?>
+                     <?php if (!$repeat) :?>
+                        <tr>
+                            <td class="col-product">
+                                    <?php $product = $block->getProduct()->load($item['product_id']);
+                                     ?>
+                                    <div>
+                                        <div class="product-title" id="order_item_81_title"><?php echo $product->getName(); ?>
+                                        </div>
+                                        <div>
+                                            <span>Sku: </span><span><?php echo $product->getSku(); ?></span>
+                                        </div>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <?php $product = $block->getProduct()->load($item['product_id']);
+                                     ?>
+                                    <div>
+                                        <div class="product-type"><?php echo $product->getTypeId(); ?></div>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <?php if (isset($item['total_days']) && $item['total_days']!=0) :?>
+                                    <div>
+                                        <div class="total-days"><?php echo $item['total_days']; ?></div>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-in"><?php echo date ( 'l, F jS Y', substr ( strtotime($item['booking_start_date']) ,0,10) ); ?></div>
+                                        <?php if (substr($item['booking_start_date'],11) != '00:00:00') : ?>
+                                        <div class="check-in-time"><?php echo __('From ').date('g:i a',strtotime(substr($item['booking_start_date'],11))); ?></div>
+                                         <?php endif;?>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-out"><?php echo date ( 'l, F jS Y', substr ( strtotime($item['booking_end_date']) ,0,10) ); ?>
+                                        </div>
+                                        <?php if (substr($item['booking_end_date'],11) != '00:00:00') : ?>
+                                        <div class="check-out-time"><?php echo __(' To ').date('g:i a',strtotime(substr($item['booking_end_date'],11))); ?>
+                                        </div>
+                                         <?php endif;?>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-out"><?php if (isset($item['qty'])) {echo $item['qty']; } else { $roomNumber = ''; ?>
+
+                                            <?php if ($bookedRoomNumbers!='') :  ?>
+                                                <p class="room-number"><?php 
+                                                    foreach ($bookedRoomNumbers as $number) : ?>
+                                                        <div> <?php echo __('Room Number : ').$number; ?> <div>
+                                                      <?php  endforeach;
+                                                     ?>
+                                                </p>
+                                            <?php endif; ?>
+
+                                         <?php } ?>
+                                         </div>
+                                    </div>
+                            </td>
+                        </tr>
+                        <?php 
+                        if (isset($item['booking_start_date']) && $item['booking_end_date']) {
+
+                            $startdate = $item['booking_start_date'];
+                            $enddate = $item['booking_end_date'];
+                        }
+                        
+                         ?>
+
+                   <?php endif;  
+                        endforeach;
+                        endif; ?>
+        </tbody>                 
+    </table>
+</div>
+</section>

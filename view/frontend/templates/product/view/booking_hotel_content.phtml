@@ -1,0 +1,229 @@
+<?php 
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	$priceHelper = $objectManager->create('Magento\Framework\Pricing\Helper\Data'); 
+    
+
+
+	  //$rooms_data = $block->getRoomsData();
+	  $roomsCollection = $this->getCollection();
+	  //print_r($rooms_data->getData()); die;
+	  $param = $block->getParams();
+	  $roomcategories = $this->getCategory();
+	  $helper = $objectManager->get('Ced\Booking\Helper\Data');
+	  $categories = $helper->getRoomCategories();
+	  $types = $helper->getRoomTypes();
+	  $currencysymbol = $block->getCurrentSymbol();
+	  $facilitiesRelation = $block->getFacilitiesRelation();
+	  $facilities = $helper->getFacilities();
+	  $productId = $block->getProductId();
+	  $currentProduct = $block->getCurrentProduct();
+
+      $Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+      $mapApiKey = $Datahelper->getStoreConfigValue('booking/booking_config/map_api_key');
+      $mapMaxZoom = $Datahelper->getStoreConfigValue('booking/booking_config/map_zoom');
+
+
+      $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+
+	  $roompopupUrl = $_baseUrl.'booking/booking/bookroom';
+?>
+<div id="room-popup-wrapper" style="display: none"></div>
+
+
+<h3><?php echo __('Hotel Facilities');  ?></h3>
+<div id="facility-wrapper" class="booking-facilites">
+    <div class="span12">
+        <div id="facilities">
+          <?php if ($facilitiesRelation!=null) :
+              			foreach ($facilitiesRelation as $val) :
+              				 ?>
+			           <div class="item">
+			                 <?php if (preg_match('/fa-/',$val->getImage()) || preg_match('/im-/',$val->getImage())) { 
+
+			                    		$icon_class = explode('-', $val->getImage() ); 
+										          $type_font = $icon_class[0]; ?>
+                                        <i title="<?php echo $val->getTitle();?>" class="ace-icon <?php echo $type_font.' '; ?><?php echo $val->getImage(); ?> fa-2x" ></i>
+                                       
+			                    	<?php } elseif ($val->getImage() == '') { ?>
+			                    		<img id="zoom-facility-image<?php echo $val->getId();?>" title="<?php echo $val->getTitle();?>" width="10px" src="<?php echo $this->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');?>" alt="<?php echo $val->getTitle();?>">
+			                    		
+			                    		<!-- facility image Modal -->
+										<div id="facilityModal<?php echo $val->getId();?>" class="facility-modal">
+										  <span class="facility-img-close">&times;</span>
+										  <img class="facility-modal-content" id="facility_modal_img<?php echo $val->getId();?>">
+										  <div class="facility-caption" id="facility_caption<?php echo $val->getId();?>"></div>
+										</div>
+			                    	<?php } else { ?>
+			                    		<img id="zoom-facility-image<?php echo $val->getId();?>" title="<?php echo $val->getTitle();?>" width="10px" src="<?php echo $block->getUrl().'pub/media/'.$val->getImage();?>" alt="<?php echo $val->getTitle();?>">
+			                    		
+			                    		<!-- facility image Modal -->
+										<div id="facilityModal<?php echo $val->getId();?>" class="facility-modal">
+										  <span class="facility-img-close">&times;</span>
+										  <img class="facility-modal-content" id="facility_modal_img<?php echo $val->getId();?>">
+										  <div class="facility-caption" id="facility_caption<?php echo $val->getId();?>"></div>
+										</div>
+			                    	<?php } ?>
+			                    	<div class="facility-desciption"><?php echo $val->getDescription();?></div>
+
+			         </div>
+              	<?php 
+              		  endforeach;
+              		  else : ?>
+              		  <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('No Facilities in this Hotel.'); ?></span></div>
+              	<?php endif;
+          		?>
+        </div>
+    </div>
+</div>
+
+
+<?php /****** Zoom facility image  *****/ ?>
+<script>
+
+require([
+		'jquery'
+		],
+function ($){
+	var modal = $('[id^=facilityModal]');
+	var img =  $('[id^=zoom-facility-image]');
+	var modalImg = $("[id^=facility_modal_img]");
+	var captionText = $("[id^=facility_caption]");
+
+	img.click(function(e){
+	    modal.show();
+	    modalImg.attr('src',$(this).attr('src'));
+	    captionText.html($(this).alt);
+	});
+
+	$('.facility-img-close').click(function(e){
+		modal.hide();
+	});
+});
+
+</script>
+
+
+
+
+ <?php if ($block->getPagerHtml()): ?>
+        <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+    <?php endif ?>
+
+
+<?php /**********************For listing of rooms********************/ ?>
+	<h3><?php echo __('Available Rooms') ?></h3>
+	<div class="block-content" id="all-room-listing">
+	    <?php if (count($roomsCollection) > 0): ?>
+	        <div class="table-wrapper orders-recent">
+	            <table class="data table table-order-items recent" id="my-orders-table">
+	                <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Available Rooms') ?></caption>
+	                <thead>
+	                    <tr>
+	                        <th scope="col" class="col rooms"><?php /* @escapeNotVerified */ echo __('Rooms') ?></th>
+	                        <th scope="col" class="col category"><?php /* @escapeNotVerified */ echo __('Category') ?></th>
+	                        <th scope="col" class="col type"><?php /* @escapeNotVerified */ echo __('Type') ?></th>
+	                        <th scope="col" class="col price"><?php /* @escapeNotVerified */ echo __('Price') ?></th>
+	                        <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Book Now') ?></th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <?php //$prevId=''; 
+
+	                    	foreach ($roomsCollection as $room):
+	                    	//if ($room->getId() != $prevId) : ?>
+	                        <tr>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Rooms')) ?>" class="col rooms"><?php /* @escapeNotVerified */ echo '';?>
+
+		                            <div class="room-image">
+					            		<?php if ($room->getImageName()!='') { ?>
+					            					<img src="<?php echo $block->getUrl().'pub/media/ced/booking/room/images/'.$room->getImageName(); ?>" width="170px" height="30px">
+					            				<?php } else { ?>
+					            			  		<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg'); ?>" width="170px" height="30px">
+					            				<?php } ?>
+					            			  
+					            	</div>
+					            </td>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Category')) ?>" class="col date"><?php /* @escapeNotVerified */ 
+ 								echo $objectManager->create('Ced\Booking\Model\RoomTypeCategory')->load($room->getRoomCategoryId())->getTitle();  ?></td>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Type')) ?>" class="col shipping"><?php echo $objectManager->create('Ced\Booking\Model\Roomtype')->load($room->getRoomTypeId())->getTitle();  ?></td>
+
+	                            <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col total"><?php /* @escapeNotVerified */ 
+
+	    							echo $priceHelper->currency($room->getPrice(), true, false); ?></td>
+	                            
+	                            <td data-th="<?php echo $block->escapeHtml(__('Book Now')) ?>" class="col actions">
+
+	                            <div class="actions">
+						            <button id="<?php echo $room->getId(); ?>" type="button" title="<?php echo __('Book Room');?>" class="action primary book-room" >
+						                <span><?php echo __('Book Room');?></span>
+						            </button>
+						        </div>
+
+
+	                            </td>
+	                        </tr>
+
+	                    <?php //$prevId = $room->getId();
+	                    	  //endif;
+	                    	  endforeach; ?>
+	                </tbody>
+	            </table>
+	        </div>
+	    <?php else: ?>
+	        <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('No Rooms in this Hotel.'); ?></span></div>
+	    <?php endif; ?>
+	</div>
+</div>
+<script>
+	require([
+			'jquery',
+			"Magento_Ui/js/modal/modal"
+		],
+	function ($,modal){
+
+
+	 $('.book-room').click(function(e){
+
+	 	var roomId = $(this).attr('id');
+	 	var productId = "<?php echo $productId; ?>";
+			
+		$.ajax({
+			url : '<?php echo $roompopupUrl; ?>',
+			dataType : 'json',
+			type : 'POST',
+			data : {room_id : roomId,product_id:productId},
+			showLoader: true,
+			success : function(res)
+			{
+				$('#room-popup-wrapper').css('display','block');
+				$('#room-popup-wrapper').html(res.template);
+				var options = {
+	                type: 'slide',
+	                responsive: true,
+	                innerScroll: true,
+	                title: '',
+	                buttons: [{
+	                	text: $.mage.__('Close'),
+                        class: 'modal-btn',
+	                    click: function () {
+	                        this.closeModal();
+	                    }
+	                }]
+            	};
+				$('#room-popup-wrapper').trigger('contentUpdated');
+
+            	var popup = modal(options, $('#room-popup-wrapper'));
+
+            	$('#room-popup-wrapper').modal('openModal');
+			},
+			error : function()
+			{
+				
+			}
+		}); 
+	 	
+	 });
+});
+</script> 

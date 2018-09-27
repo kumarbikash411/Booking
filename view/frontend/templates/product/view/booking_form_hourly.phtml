@@ -1,0 +1,126 @@
+<?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  $params = $this->getRequest()->getParams();
+	  $Qty = $block->getCurrentProduct()->getStockQtyForAInterval();
+	  $price = $block->getCurrentProduct()->getFinalPrice();
+	  $product_id = $block->getCurrentProduct()->getId();
+      $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl(); 
+	  $checkRentProductAvailabilityUrl = $_baseUrl.'booking/booking/checkrenttypeproductavailability';
+     
+?>
+
+<div class="product-options-wrapper">
+	<div class="fieldset" id="date_range">
+	 	<div class="field">
+            <label class="label" for="hourly-rent-check-in">
+                <span>Check In</span>
+            </label>
+            <div class="control">
+            <input type="hidden" id="booking-type" name="booking-type" value="<?php echo __('rent_hourly');?>"/>
+				<div class="check-in-field" style="width: 180%">
+						<input class="hourly-fields" type="text" id="hourly-rent-check-in" name="check-in" value="<?php if (isset($params['check_in'])) { echo $params['check_in']; } ?>"/>
+				</div>
+            </div>
+        </div>
+		<div class="field">
+            <label class="label" for="rent-form-check-out">
+                <span>Check Out</span>
+            </label>
+            <div class="control">
+				<div class="check-out-field" style="width: 180%">
+					<input type="text" id="hourly-rent-check-out" name="check-out" value="<?php if (isset($params['check_out'])) { echo $params['check_out']; } ?>"  class="hourly-fields"/>
+				</div>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label" for="rent-qty">
+                <span>Qty</span>
+            </label>
+            <div class="control">
+                <select class="rent-qty" name="qty" style="width: 17%">
+					<?php for ($i=1;$i<=$Qty; $i++) { ?>
+						<option value="<?php echo $i;?>"><?php echo $i; ?></option>
+						<?php } ?>
+				</select>
+
+            </div>
+        </div>
+			<div class="field">
+			<div id="rent-availability-info"></div>
+		</div>	
+	    <div class="product-options-bottom">
+	   	 	<div class="box-tocart">
+		        <div class="actions">
+		            <button  id="rent-hourly-check-availablity" class="action subscribe primary" title="Check Availability" type="button">
+		                <span><?php echo __('Check Availability') ?></span>
+		            </button>
+		        </div>
+	       </div>
+     	</div>
+	</div>
+</div>	
+<?php echo $this->getLayout()->createBlock('Magento\Catalog\Block\Product\View')->setTemplate('Ced_Booking::product/view/addtocart.phtml')->toHtml(); ?>
+<script>
+	require([
+			'jquery',
+			"jquery/ui",
+			"mage/calendar"
+		],
+	function ($){
+
+		var dateToday = new Date();
+
+  		$( "#hourly-rent-check-in, #hourly-rent-check-out" ).datetimepicker({
+				minDate: dateToday,
+				dateFormat: "yy-mm-dd",
+				showsTime: true,
+				timeFormat: 'hh:mm tt',
+				ampm: true,
+				onSelect: function( selectedDate, inst) {
+					$('#product-addtocart-button').prop('disabled',true);
+					var date = jQuery.datepicker.parseDate(inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat, selectedDate, inst.settings);
+					var dateText = jQuery.datepicker.formatDate("yy-mm-dd", date, inst.settings);
+					if(this.id == "hourly-rent-check-in"){										
+						date.setDate(date.getDate());
+						jQuery("#hourly-rent-check-out" ).datepicker( "option", "minDate", date );
+					}
+					
+				}
+			});
+
+		$('.rent-qty').change(function(){
+
+			$('#product-addtocart-button').prop('disabled',true);
+		});
+
+
+
+	    $('#rent-hourly-check-availablity').click(function(){
+
+	    	var price = "<?php echo $price; ?>";
+	    	var checkIn = $('#hourly-rent-check-in').val();
+	    	var checkOut = $('#hourly-rent-check-out').val();
+	    	var qty = $('.rent-qty').val();
+	    	var from_time = $('#from_time').val();
+	    	var to_time = $('#to_time').val();
+	    	var productId = "<?php echo $product_id; ?>";
+
+		    $.ajax({
+				url : '<?php echo $checkRentProductAvailabilityUrl; ?>',
+				dataType : 'json',
+				type : 'POST',
+				data : {rent:'hourly',check_in: checkIn,check_out: checkOut,qty: qty,price:price,from_time:from_time,to_time:to_time,product_id:productId},
+				showLoader: true,
+				success : function(res)
+				{
+					$('#rent-availability-info').html(res.template);
+				},
+				error : function()
+				{
+						
+				}
+			}); 	 	
+		});
+});
+</script>

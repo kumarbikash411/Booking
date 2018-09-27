@@ -1,0 +1,143 @@
+<?php 
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+		$priceHelper = $objectManager->create('Magento\Framework\Pricing\Helper\Data'); 
+    
+
+
+	  $rooms_data = $block->getRoomsData();
+	  //$roomsCollection = $this->getRoomCollection();
+	  //print_r($roomsCollection->getData());die;
+	  $param = $block->getParams();
+	  $excludedays= $block->getRoomExcludeDays();
+	  $roomcategories = $this->getCategory();
+	  $helper = $objectManager->get('Ced\Booking\Helper\Data');
+	  $categories = $helper->getRoomCategories();
+	  $types = $helper->getRoomTypes();
+	  $currencysymbol = $block->getCurrentSymbol();
+	  $facilitiesRelation = $block->getFacilitiesRelation();
+	  $facilities = $helper->getFacilities();
+	  $productId = $block->getProductId();
+
+	 
+      $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+
+	  $roompopupUrl = $_baseUrl.'booking/booking/bookroom';
+?>
+
+
+ <?php //if ($block->getPagerHtml()): ?>
+        <!-- <div class="order-products-toolbar toolbar bottom"><?php //echo $block->getPagerHtml(); ?></div> -->
+    <?php //endif ?>
+
+<?php /*****************************************/ ?>
+<?php if (count($rooms_data) > 0): ?>
+	        <div class="table-wrapper orders-recent">
+	            <table class="data table table-order-items recent" id="my-orders-table">
+	                <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Available Rooms') ?></caption>
+	                <thead>
+	                    <tr>
+	                        <th scope="col" class="col rooms"><?php /* @escapeNotVerified */ echo __('Rooms') ?></th>
+	                        <th scope="col" class="col category"><?php /* @escapeNotVerified */ echo __('Category') ?></th>
+	                        <th scope="col" class="col type"><?php /* @escapeNotVerified */ echo __('Type') ?></th>
+	                        <th scope="col" class="col price"><?php /* @escapeNotVerified */ echo __('Price') ?></th>
+	                        <th scope="col" class="col actions"><?php /* @escapeNotVerified */ echo __('Book Now') ?></th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <?php //$prevId=''; 
+
+	                    	foreach ($rooms_data as $room):
+	                    	//if ($room->getId() != $prevId) : ?>
+	                        <tr>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Rooms')) ?>" class="col rooms"><?php /* @escapeNotVerified */ echo '';?>
+
+		                            <div class="room-image">
+					            		<?php if ($room->getImageName()!='') { ?>
+					            					<img src="<?php echo $block->getUrl().'pub/media/ced/booking/room/images/'.$room->getImageName(); ?>" width="170px" height="30px">
+					            				<?php } else { ?>
+					            			  		<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg'); ?>" width="170px" height="30px">
+					            				<?php } ?>
+					            			  
+					            	</div>
+					            </td>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Category')) ?>" class="col date"><?php /* @escapeNotVerified */ 
+ 								echo $objectManager->create('Ced\Booking\Model\RoomTypeCategory')->load($room->getRoomCategoryId())->getTitle();  ?></td>
+	                            <td data-th="<?php echo $block->escapeHtml(__('Type')) ?>" class="col shipping"><?php echo $objectManager->create('Ced\Booking\Model\Roomtype')->load($room->getRoomTypeId())->getTitle();  ?></td>
+
+	                            <td data-th="<?php echo $block->escapeHtml(__('Price')) ?>" class="col total"><?php /* @escapeNotVerified */ 
+
+	    							echo $priceHelper->currency($room->getPrice(), true, false); ?></td>
+	                            
+	                            <td data-th="<?php echo $block->escapeHtml(__('Book Now')) ?>" class="col actions">
+
+	                            <div class="actions">
+						            <button id="<?php echo $room->getId(); ?>" type="button" title="<?php echo __('Book Room');?>" class="action primary book-room" >
+						                <span><?php echo __('Book Room');?></span>
+						            </button>
+						        </div>
+
+
+	                            </td>
+	                        </tr>
+
+	                    <?php //$prevId = $room->getId();
+	                    	  //endif;
+	                    	  endforeach; ?>
+	                </tbody>
+	            </table>
+	        </div>
+	    <?php else: ?>
+	        <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('No Rooms in this Hotel.'); ?></span></div>
+	    <?php endif; ?>
+
+
+
+<script>
+	require([
+			'jquery',
+			"Magento_Ui/js/modal/modal"
+		],
+	function ($,modal){
+
+	 $('.book-room').click(function(){
+
+	 	var roomId = $(this).attr('id');
+	 	var productId = "<?php echo $productId; ?>";
+			
+		$.ajax({
+			url : '<?php echo $roompopupUrl; ?>',
+			dataType : 'json',
+			type : 'POST',
+			data : {room_id : roomId,product_id:productId},
+			showLoader: true,
+			success : function(res)
+			{
+				$('#room-popup-wrapper').css('display','block');
+				$('#room-popup-wrapper').html(res.template);
+				var options = {
+	                type: 'slide',
+	                responsive: true,
+	                innerScroll: true,
+	                title: 'Room Details',
+	                buttons: [{
+	                    click: function () {
+	                        this.closeModal();
+	                    }
+	                }]
+            	};
+            	$('#room-popup-wrapper').trigger('contentUpdated');
+            	var popup = modal(options, $('#room-popup-wrapper'));
+
+            	$('#room-popup-wrapper').modal('openModal');
+			},
+			error : function()
+			{
+				
+			}
+		}); 
+	 	
+	 });
+});
+</script> 

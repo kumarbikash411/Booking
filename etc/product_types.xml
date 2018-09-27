@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Catalog/etc/product_types.xsd">
+    <type name="booking" label="Booking" modelInstance="Ced\Booking\Model\Product\Booking" isQty="true" indexPriority="10" sortOrder="1">
+      <priceModel instance="Ced\Booking\Model\Product\Price" />
+    </type>
+</config>

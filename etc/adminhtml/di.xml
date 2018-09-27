@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author      CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+     <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="booking" xsi:type="array">
+                    <item name="class" xsi:type="string">Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="non_working_days_booking_daily" xsi:type="array">
+                    <item name="class" xsi:type="string">Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel\NonWorkingDaysOptions</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+                <item name="non_working_days_booking_hourly" xsi:type="array">
+                    <item name="class" xsi:type="string">Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel\NonWorkingDaysOptionsHourly</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel">
+        <arguments>
+             <argument name="formName" xsi:type="string">product_form</argument>
+            <argument name="dataScopeName" xsi:type="string">product_form.product_form</argument> 
+            <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
+            <argument name="dataSourceName" xsi:type="string">product_form.product_form_data_source</argument>
+        </arguments>
+    </type>
+    <type name="Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel\NonWorkingDaysOptions">
+        <arguments>
+             <argument name="formName" xsi:type="string">product_form</argument>
+            <argument name="dataScopeName" xsi:type="string">product_form.product_form</argument> 
+            <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
+            <argument name="dataSourceName" xsi:type="string">product_form.product_form_data_source</argument>
+        </arguments>
+    </type>
+    <type name="Ced\Booking\Ui\DataProvider\Product\Form\Modifier\BookingPanel\NonWorkingDaysOptionsHourly">
+        <arguments>
+             <argument name="formName" xsi:type="string">product_form</argument>
+            <argument name="dataScopeName" xsi:type="string">product_form.product_form</argument> 
+            <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
+            <argument name="dataSourceName" xsi:type="string">product_form.product_form_data_source</argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AttributeSet" type="Ced\Booking\Ui\DataProvider\Product\Form\Modifier\AttributeSet" />
+    <preference for="Magento\Catalog\Block\Adminhtml\Product\Edit\Button\Back" type="Ced\Booking\Block\Adminhtml\Product\Edit\Button\Back" />
+</config>

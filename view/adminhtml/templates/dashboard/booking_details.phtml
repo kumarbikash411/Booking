@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the 
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+  * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author      CedCommerce Core Team <connect@cedcommerce.com >
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license     http://cedcommerce.com/license-agreement.txt
+ */
+?>
+<?php
+$orderDetails = $this->getOrderDetails();
+?>
+
+
+
+<fieldset class="admin__fieldset">
+<div class="admin__field">
+   <label class="admin__field-label">
+        <span><?php echo __('# Order'); ?></span>
+    </label>
+    <div class="admin__field-control" >
+        <a class="admin__control"  href="<?php echo $this->getUrl('sales/order/view', array('id' => $orderDetails['order_entity_id'])) ?>" target="_blank">
+	  		#<?php echo $orderDetails['order_id'] ?>
+	  		</a>
+        </div>
+    </div>
+  <div class="admin__field">
+   <label class="admin__field-label">
+        <span><?php echo __('Product'); ?></span>
+    </label>
+    <div class="admin__field-control" >
+        <a href="<?php echo $this->getUrl('catalog/product/edit', array('id' => $orderDetails['product_id'], 'set_id' => $orderDetails['product_attribute_set_id'])); ?>" target="_blank">
+	  		<?php echo $orderDetails['product_name'] ?>
+	  		</a>
+        </div>
+    </div>
+    
+    <div class="admin__field">
+   <label class="admin__field-label">
+        <span><?php echo __('Booking From'); ?></span>
+    </label>
+    <div class="admin__field-control" >
+        <?php echo date('Y-m-d',strtotime($orderDetails['booking_from'])); ?>
+        </div>
+    </div>
+
+
+    <div class="admin__field">
+      <label class="admin__field-label">
+          <span><?php echo __('Booking To'); ?></span>
+      </label>
+      <div class="admin__field-control" >
+          <?php echo date('Y-m-d',strtotime($orderDetails['booking_to'])); ?>
+      </div>
+    </div>
+
+<div class="admin__field">
+   <label class="admin__field-label">
+        <span><?php echo __('Qty'); ?></span>
+    </label>
+    <div class="admin__field-control" >
+       <?php echo $orderDetails['booking_qty'] ?>
+        </div>
+</div> 
+
+<div class="admin__field">
+   <label class="admin__field-label">
+        <span><?php echo __('Booking Status'); ?></span>
+    </label>
+    <div class="admin__field-control" >
+       <?php echo $orderDetails['booking_status'] ?>
+        </div>
+</div> 
+</fieldset>
+
+
+
+
+

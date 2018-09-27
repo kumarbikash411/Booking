@@ -1,0 +1,138 @@
+<?php $productData = $block->getCurrentProduct(); 
+	  $params = $this->getRequest()->getParams();
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+	  $roomCategoriesHelper = $objectManager->create('Ced\Booking\Helper\Data')->getRoomCategories();
+	  $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+							   ->getStore()
+                               ->getBaseUrl();
+	  $urlsearch = $_baseUrl.'booking/booking/searchroom';
+?>
+<?php if ($productData->getStarRating() !='') { ?>
+<div class="hotel-star-rating" style="font-size: 25px;"><?php echo __('( '.$productData->getStarRating().' Star)'); ?></div>
+<?php } ?>
+<div class="search-room product-add-form ">
+	<form id="search-rooms-form">
+	<div class="product-options-wrapper">
+
+	<div class="fieldset" id="date_range">
+	 	<div class="field">
+            <label class="label" for="room-check-in">
+                <span>Check In</span>
+            </label>
+            <div class="control">
+                <input type="text" id="room-check-in" name="check-in" value="<?php if (isset($params['check_in'])) { echo $params['check_in']; } ?>" readonly="true"/>
+            </div>
+        </div>
+
+
+		<div class="field">
+            <label class="label" for="room-check-out">
+                <span>Check Out</span>
+            </label>
+            <div class="control">
+                <input type="text" id="room-check-out" name="check-out" value="<?php if (isset($params['check_out'])) { echo $params['check_out']; } ?>" readonly="true"/>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label" for="category">
+                <span>Category</span>
+            </label>
+            <div class="control">
+                <select name="category" id="category" class="room-category">
+				<option value="">-select category-</option>
+				<?php if (count($roomCategoriesHelper)!=0) : 
+					    foreach ($roomCategoriesHelper as $category) : ?>
+					    <option value="<?php echo $category->getId(); ?>"><?php echo $category->getTitle(); ?></option>
+				<?php endforeach;
+					endif; ?>
+			</select>
+
+            </div>
+        </div>
+
+
+		
+    <div class="product-options-bottom">
+   	 <div class="box-tocart">
+
+        <div class="actions">
+            <button  id="search-room" class="action subscribe primary" title="Search" type="button">
+                <span><?php echo __('Search') ?></span>
+            </button>
+        </div>
+       </div>
+     </div>
+
+	</div>
+	</div>	
+	
+		
+	</form>
+	
+</div>
+
+<script>
+	require([
+		'jquery',
+		"jquery/ui",
+		"mage/calendar"
+		],
+		function ($){
+
+			/*$("#room-check-in").hover(function(){
+			   	$("#room-check-in" ).calendar({
+			   		dateFormat: "yy-mm-dd",
+			   	});
+			});
+		    $("#room-check-out").hover(function(){
+		   	 	$("#room-check-out" ).calendar({
+		   			dateFormat: "yy-mm-dd",
+		   		});
+		    });
+*/			
+
+			var dateToday = new Date();
+
+  			$( "#room-check-in, #room-check-out" ).datepicker({
+				minDate: dateToday,
+				dateFormat: "yy-mm-dd",
+				onSelect: function( selectedDate, inst) {
+					var date = jQuery.datepicker.parseDate(inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat, selectedDate, inst.settings);
+					var dateText = jQuery.datepicker.formatDate("yy-mm-dd", date, inst.settings);
+					if(this.id == "room-check-in"){										
+						date.setDate(date.getDate() + 1);
+						jQuery("#room-check-out" ).datepicker( "option", "minDate", date );
+					}
+					
+				}
+			});
+			
+
+		    /* on click search button */
+
+			    $('#search-room').click(function(){
+			    	//$('#hotel-rooms-listing').hide();
+			    	var check_in = $('#room-check-in').val();
+		   	 		var check_out = $('#room-check-out').val();
+		    		var category = $('.room-category').val();
+		    		var product_id = '<?php echo $productData->getId();?>';
+			    	$.ajax({
+	   					url : '<?php echo $urlsearch;?>',
+	   					dataType : 'json',
+	   					type : 'POST',
+	   					data : {check_in:check_in,check_out:check_out,category:category,product_id:product_id},
+	   					showLoader: true,
+	   					success : function(res)
+	   					{
+	   						$('#all-room-listing').html(res.template);
+	   					},
+	   					error: function(xhr, status, error) {
+  							var err = eval("(" + xhr.responseText + ")");
+  							alert(error);
+						}
+	   				}); 
+			    });
+		});
+</script>

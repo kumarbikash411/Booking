@@ -1,0 +1,264 @@
+<?php $bookingroomtypes = $block->getroomtypes(); 
+      $roomsimages = $block->getroomsimages();
+      $calendardata = $block->getroomPrice();
+      $pricehelper = $block->getPriceHelper();
+      $productId = $block->getProductId();
+      $currentdate = $block->getcurrentdate();
+      $searchedroomsData = $this->getSearchedData();
+      $caldata = $block->getCalendarData();
+      $roomsdata = $block->getJoinTableRoomsData();
+      $paramsdata = $block->getParamsdata();
+      $roomarray = [];
+
+      foreach ($roomsdata->getData() as $value) {
+      	
+      	$roomarray[$value['room_type']][] = $value;
+        
+            if (!isset($searchedroomsData['id'])) {
+
+            	if (isset($paramsdata) && $paramsdata['search_by']=='price') {
+
+            		if ($currentdate >= $value['calendar_startdate'] && $currentdate <= $value['calendar_enddate']) {
+
+            			if ($paramsdata['from_price'] <= $value['calendar_price'] && $paramsdata['to_price'] >= $value['calendar_price']) {
+
+
+            				$data[] = $value;
+            			}
+            		}
+            	} 
+      		    else if (($searchedroomsData['roomtype'] == $value['room_type'] && ($value['calendar_id'] != '')) || (($searchedroomsData['searchcheckin'] >= $value['calendar_startdate']) && ($searchedroomsData['searchcheckin'] <= $value['calendar_enddate']) && ($searchedroomsData['searchcheckout'] >= $value['calendar_startdate']) && ($searchedroomsData['searchcheckout'] <= $value['calendar_enddate'])) && ($searchedroomsData['searchcheckout'] > $searchedroomsData['searchcheckin'])) {
+      
+      			    $data[] = $value;
+                
+      		    }
+      	    }
+        } 
+        // if (isset($data)) {
+        // 	print_r($data); die("gfhvcn");
+        // }
+      	$perfectArray = [];
+      	$i = -1;
+      	foreach ($roomarray as $rooms) {
+      		$flag = false;
+      		$flagfor1 = false;
+      		$size =  count($rooms);
+      		$j = 0;
+      		$default1ID ='';
+      		foreach ($rooms as $room) {      			
+      			$j++;
+      			if($room['calendar_default_value'] == '2' && ($currentdate >= $room['calendar_startdate'] && $currentdate <= $room['calendar_enddate'])){
+      				$flag = true;
+      				$perfectArray[$i++] = $room;
+      			} else if ($room['calendar_default_value'] == '1') {
+      					if($flagfor1){
+      						continue;
+      					}
+      					$default1ID = $i++;
+      					$flagfor1 = true;
+      					$perfectArray[$default1ID] = $room;
+      				}      				
+      			   			
+      			if ($flag && ($j == $size)) {
+      				unset($perfectArray[$default1ID]);
+      				break;
+      			}     
+      			if($flag){
+      				break;
+      			}			
+
+      		}
+
+      	} 
+      	   
+      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+      $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+
+	  $urlpopup = $_baseUrl.'booking/booking/bookroom';
+?>
+<div class="list-rooms-type">
+		<div class="">
+			<div class="list-room-header">
+				<table class="booking-table-data">
+					<thead>
+						<tr>
+							<th><?php echo __('Room Type'); ?></th>
+							<th><?php echo __('Max'); ?></th>
+							<th class="today-price"><?php echo __('Today\'s price') ?></th>
+							<th> <?php echo __('No. Of rooms'); ?> </th>
+							<th class="last"><?php echo __('Reservation'); ?> </th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php if (!isset($searchedroomsData['id'])) { 
+					        if (isset($data)) { 
+					        foreach($data as $key => $roomdata) { ?>
+                        <tr>
+							<td>
+							    <?php if ($roomdata['image'] != '') { ?>
+								<div class="roomtypes-thumbnail">
+									<a class="img-room" data-toggle="modal" data-target="#room"> 
+									<?php $imagepath = $objectManager->create('\Magento\Store\Model\StoreManagerInterface')
+						                            ->getStore()
+						                            ->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);?>
+									<img src="<?php echo $imagepath.'/images/'.$roomdata['image']; ?>" />
+									</a>
+								</div>
+							    <?php } else { ?>
+								<div class="roomtypes-thumbnail">
+									<a class="img-room" data-toggle="modal" data-target="#room"> 
+									<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg') ; ?>" />
+									</a>
+								</div>
+								<?php } ?>
+								<div class="info-room clearfix">
+									<div class="title-room">
+										<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+										<a class="room-item room-book-now" id="booking-item-"><?php echo  $roomdata['room_type'].' ('.$roomdata['child_room_type'].')';?></a>
+									</div>
+									<div class="des-room"><?php echo $roomdata['room_desc'];?></div>
+								</div> 
+							</td> 
+							<td class="max-people">
+								<ul class="booking-item-features booking-item-features-sign clearfix">
+									<li class="item-max" data-toggle="tooltip" data-placement="top"
+										title="" data-original-title="Adults Occupancy">
+										<i class="fa fa-male"></i>
+										<span class="booking-item-feature-sign">x<?php echo $roomdata['room_max_adults'];?></span>
+									</li>
+									<li class="item-max" data-toggle="tooltip" data-placement="top"
+										title="" data-original-title="Children Occupancy"><i
+										class="im im-children"></i><span
+										class="booking-item-feature-sign">x<?php echo $roomdata['room_max_children'];?></span>
+								   </li>
+								</ul>
+							</td> 
+							<td class="today_price">
+							    <?php if ($roomdata['calendar_promo'] == '') { ?>      
+								<span class="price"><strong><?php echo $pricehelper->currency($roomdata['calendar_price']);?></strong></span>
+                                <?php } else { ?>               
+                                <span class="old-price"><strong><?php echo $pricehelper->currency($roomdata['calendar_price'],true,false) ;?></strong></span>
+                                <span class="speacial-price"><strong><?php echo $pricehelper->currency($roomdata['calendar_promo'],true,false);?></strong></span>
+                                <?php } ?>
+							</td>
+							<td>
+								<span class="rooms-quantity"><strong><?php echo $roomdata['calendar_qty'];?></strong></span>
+							</td>
+							<td>
+							    <button type="button" class="book-room" id="book-room-button" value="<?php echo $roomdata['room_id'];?>"><?php echo  ('Book Now'); ?></button>
+							</td>
+							
+						</tr>
+					    <?php } } else { ?>  
+					    <input type="hidden" id="notfoundinput" value="1"></input>
+					    <div id="notfound"></div>
+					    <?php  }?>
+					  
+					<?php } else { 
+					      	foreach ($perfectArray as $rooms) {
+					       ?>
+						 <tr>
+							<td>
+							    <?php if ($rooms['image'] != '') { ?>
+								<div class="roomtypes-thumbnail">
+									<a class="img-room" data-toggle="modal" data-target="#room"> 
+									<?php $imagepath = $objectManager->create('\Magento\Store\Model\StoreManagerInterface')
+						                            ->getStore()
+						                            ->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);?>
+									<img src="<?php echo $imagepath.'/images/'.$rooms['image']; ?>" />
+									</a>
+								</div>
+							    <?php } else { ?>
+								<div class="roomtypes-thumbnail">
+									<a class="img-room" data-toggle="modal" data-target="#room"> 
+									<img src="<?php echo $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg') ; ?>" />
+									</a>
+								</div>
+								<?php }?>
+								<div class="info-room clearfix">
+									<div class="title-room">
+										<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+										<a class="room-item room-book-now" id="booking-item-"><?php echo $rooms['room_type'].' ('.$rooms['child_room_type'].')';?></a>
+									</div>
+									<div class="des-room"><?php echo $rooms['room_desc'];?></div>
+								</div> 
+							</td> 
+							<td class="max-people">
+								<ul class="booking-item-features booking-item-features-sign clearfix">
+									<li class="item-max" data-toggle="tooltip" data-placement="top"
+										title="" data-original-title="Adults Occupancy">
+										<i class="fa fa-male"></i>
+										<span class="booking-item-feature-sign">x<?php echo $rooms['room_max_adults'];?></span>
+									</li>
+									<li class="item-max" data-toggle="tooltip" data-placement="top"
+										title="" data-original-title="Children Occupancy"><i
+										class="im im-children"></i><span
+										class="booking-item-feature-sign">x<?php echo $rooms['room_max_children'];?></span>
+								   </li>
+								</ul>
+							</td> 
+							<td class="today_price">
+							    <?php if ($rooms['calendar_promo'] == '') { ?>      
+								<span class="price"><strong><?php echo $pricehelper->currency($rooms['calendar_price']);?></strong></span>
+                                <?php } else { ?>               
+                                <span class="old-price"><strong><?php echo $pricehelper->currency($rooms['calendar_price'],true,false) ;?></strong></span>
+                                <span class="speacial-price"><strong><?php echo $pricehelper->currency($rooms['calendar_promo'],true,false);?></strong></span>
+                                <?php } ?>
+							</td>
+							<td>
+								<span class="rooms-quantity"><strong><?php echo $rooms['calendar_qty'];?></strong></span>
+							</td>
+							<td>
+							    <button type="button" class="book-room" id="book-room-button" value="<?php echo $rooms['room_id'];?>"><?php echo  ('Book Now'); ?></button>
+							</td>
+							
+						</tr> 
+				    <?php  
+				             } 
+				          }
+				           ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+<script>
+require([
+			'jquery',
+			"jquery/ui"
+		],
+	function ($){
+	$('.book-room').click(function(e){
+			var roomId = $(this).val();
+			var product_id = "<?php echo $productId; ?>";
+			//$('#booking-room-content').html('');
+		//$('#booking-loader').css('display','block');
+		 $.ajax({
+			url : '<?php echo $urlpopup; ?>',
+			dataType : 'json',
+			type : 'POST',
+			data : {room_id : roomId,product_id: product_id,data_search : $('#product_addtocart_form').serialize()},
+			showLoader: true,
+			success : function(res)
+			{
+				$('.ced-booking-room-popup').css('display','block');
+				$('#booking-room-content').html(res.template);
+				$("html, body").animate({ scrollTop: 0 }, "slow");
+				$('#booking-loader').css('display','none');
+			},
+			error : function()
+			{
+				
+			}
+		}); 
+		});
+		/*$(function () { $('[data-toggle="tooltip"]').tooltip(); });*/
+		if($('#notfoundinput').val() == 1)
+		{
+			alert("RECORDS NOT FOUND");
+		}
+});
+</script>

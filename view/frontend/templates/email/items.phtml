@@ -1,0 +1,106 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$catalogProductModel = $objectManager->create('Magento\Catalog\Model\Product');
+?>
+<?php $_items = $this->getBookingItems();  ?>
+
+    <table class="email-items">
+        <thead>
+            <tr>
+                <th class="item-name">
+                    <?php /* @escapeNotVerified */ echo  __('Product Name'); ?>
+                </th>
+                <th class="item-check-in">
+                    <?php /* @escapeNotVerified */ echo  __('Check-In'); ?>
+                </th>
+                <th class="item-check-out">
+                    <?php /* @escapeNotVerified */ echo  __('Check-Out'); ?>
+                </th>
+                <th class="item-total-days">
+                    <?php /* @escapeNotVerified */ echo  __('Total Days'); ?>
+                </th>
+                <th class="item-type">
+                    <?php /* @escapeNotVerified */ echo  __('Type'); ?>
+                </th>
+                <th class="item-qty">
+                    <?php /* @escapeNotVerified */ echo  __('Qty'); ?>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="even">
+                <?php if(isset($_items) && count($_items)!=0) :
+                    foreach ($_items as $item) : ?>
+
+                        <tr>
+                            <td class="col-product">
+                                    <?php $product = $catalogProductModel->load($item['product_id']);
+                                     ?>
+                                    <div>
+                                        <div class="product-title" id="order_item_81_title"><?php echo $product->getName(); ?>
+                                        </div>
+                                        <div>
+                                            <span>Sku: </span><span><?php echo $product->getSku(); ?></span>
+                                        </div>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <?php $product = $catalogProductModel->load($item['product_id']);
+                                     ?>
+                                    <div>
+                                        <div class="product-type"><?php echo $product->getTypeId(); ?></div>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <?php if (isset($item['total_days']) && $item['total_days']!=0) :?>
+                                    <div>
+                                        <div class="total-days"><?php echo $item['total_days']; ?></div>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-in"><?php echo date ( 'l, F jS Y', substr ( strtotime($item['booking_start_date']) ,0,10) ); ?></div>
+                                        <?php if (substr($item['booking_start_date'],11) != '00:00:00') : ?>
+                                        <div class="check-in-time"><?php echo __('From ').date('g:i a',strtotime(substr($item['booking_start_date'],11))); ?></div>
+                                         <?php endif;?>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-out"><?php echo date ( 'l, F jS Y', substr ( strtotime($item['booking_end_date']) ,0,10) ); ?>
+                                        </div>
+                                        <?php if (substr($item['booking_end_date'],11) != '00:00:00') : ?>
+                                        <div class="check-out-time"><?php echo __(' To ').date('g:i a',strtotime(substr($item['booking_end_date'],11))); ?>
+                                        </div>
+                                         <?php endif;?>
+                                    </div>
+                            </td>
+                            <td class="col-product">
+                                    <div>
+                                        <div class="check-out"><?php if (isset($item['qty'])) {echo $item['qty']; } else { $roomNumber = ''; ?>
+
+                                            <?php if ($bookedRoomNumbers!='') :  ?>
+                                                <p class="room-number"><?php 
+                                                    foreach ($bookedRoomNumbers as $number) : ?>
+                                                        <div> <?php echo __('Room Numbers : ').$roomNumber = $number.','.$roomNumber ; ?> <div>
+                                                      <?php  endforeach;
+                                                     ?>
+                                                </p>
+                                            <?php endif; ?>
+
+                                         <?php } ?>
+                                         </div>
+                                    </div>
+                            </td>
+                        </tr>
+
+                   <?php endforeach;
+                        endif; ?>
+        </tbody>                     
+    </table>

@@ -1,0 +1,90 @@
+<?php 
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+$_CalendersaveUrl = $_baseUrl.'admin/booking/calendar/calendar';
+$_BookingPriceUrl = $_baseUrl.'admin/booking/bookingType/BookingRentPrice';
+?>
+<div class="field booking-rent" id="attribute-show-booking-popup-container">
+					   <label for="show-booking-popup" class="label admin__field-label"><span><?php echo __('Booking Price for Rent') ?></span></label>
+					   <div class="control">
+							<button type="button" class="action-default secondary" title="<?php echo __('Set Price') ?>" id="price_setup">
+								<span><?php echo __('Set Price') ?></span>
+							</button>
+					   </div>
+					</div>
+<div id="rent_price_popup">
+</div>
+<script>
+require([
+	'jquery',
+	'Magento_Ui/js/modal/alert',
+	'Magento_Ui/js/modal/modal',
+],
+function($,alert,modal) {
+		$('#price_setup').click(function(){
+				$('#add-new-booking-type-calendar').css('display','none');
+				var sku = $('[name="product[sku]"]').val();
+				var booking_type = $('[name="booking_type"]').val();
+				
+				$.ajax({
+				url: '<?php  echo $_BookingPriceUrl; ?>',
+				dataType : 'json',
+				type: 'POST',
+				data: {'sku': sku,'booking_type':booking_type},
+				showLoader: true,
+				success : function(result)
+				{
+					$('#rent_price_popup').html(result.template_rent_price);
+				},
+				error : function()
+				{
+					alert({
+						title: '',
+						content: '<?php echo __('System are errors, Please check again!') ?>'
+					});
+				}
+				});
+
+				var options = {
+					type: 'slide',
+					responsive: false,
+					innerScroll: false,
+					modalLeftMargin: 45,
+					responsiveClass: 'modal-slide',
+					title: '<?php echo __('Setup Price') ?>',
+					buttons: [{
+						text: $.mage.__('Close'),
+						class: '',
+						click: function () {
+							this.closeModal();
+						}
+					}]
+				};
+				var popup = modal(options, $('#rent_price_popup'));
+				$('#rent_price_popup').modal('openModal');
+				//$('#booking-temp-check-price-update').val(1);
+
+
+				// $.ajax({
+				// url: '<?php  echo $_CalendersaveUrl; ?>',
+				// dataType : 'json',
+				// type: 'POST',
+				// data: {'sku': sku,'booking_type':booking_type},
+				// showLoader: true,
+				// success : function(result)
+				// {
+				// 	//$('#booking_type_calendar').html(result.html_calendar_form);
+				// },
+				// error : function()
+				// {
+				// 	alert({
+				// 		title: '',
+				// 		content: '<?php echo __('System are errors, Please check again!') ?>'
+				// 	});
+				// }
+			//});
+		});
+	});
+</script>

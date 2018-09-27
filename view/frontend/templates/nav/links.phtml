@@ -1,0 +1,42 @@
+<?php $id = $block->getIdModifier() ? '-' . $block->getIdModifier() : '' ?>
+<?php $links =  $block->getAllNavLinks(); ?> 
+<?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); ?>
+<?php $isBookingEnable = $objectManager->create('Ced\Booking\Helper\Data')->getStoreConfig('booking/booking_config/enable');  ?>
+
+<?php if(count($links) > 0 && $isBookingEnable) {
+?>
+
+<div class="switcher booking switcher-booking" data-ui-id="booking-switcher"
+     id="switcher-booking<?php /* @escapeNotVerified */
+     echo $id ?>">
+    <strong class="label switcher-label"><span><?php /* @escapeNotVerified */
+            echo __('Bookings') ?></span></strong>
+    <div class="actions dropdown options switcher-options">
+        <div class="action toggle switcher-trigger" id="switcher-booking-trigger<?php /* @escapeNotVerified */
+        echo $id ?>">
+            <strong class="view-bookings">
+                <span><?php echo __('Bookings') ?></span>
+            </strong>
+        </div>
+        <ul class="dropdown switcher-dropdown"
+            data-mage-init='{"dropdownDialog":{
+                "appendTo":"#switcher-booking<?php /* @escapeNotVerified */
+            echo $id ?> > .options",
+                "triggerTarget":"#switcher-booking-trigger<?php /*   @escapeNotVerified */
+            echo $id ?>",
+                "closeOnMouseLeave": false,
+                "triggerClass":"active",
+                "parentClass":"active",
+                "buttons":null}}'>
+
+           <?php foreach ($links as $link){ ?>
+            <li class="switcher-option">
+                <a href="<?php echo $link['url'] ?>">
+                    <?php echo __($link['label']) ?>
+                </a>
+            </li>
+        <?php } ?>
+        </ul>
+    </div>
+</div>
+<?php } ?>

@@ -1,0 +1,285 @@
+<?php 
+$param = $block->getParam();
+$bookingId = $param['booking_id'];
+$bookingType = $param['booking_type'];
+$bookingcurrentdate = $block->getbookingcurrentdate();
+$currencysymbol = $block->getcurrencysymbol();
+$bookingitems = $block->getBookingItems(); 
+$calendarId = $bookingitems->getCalendarId();
+$sku = $param['sku'];
+
+
+$defaultValue = '';
+$caljson = '{}';
+$defaultValue = 2;
+$startdate = '';
+$enddate = '';
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+$_calendarsaveUrl = $_baseUrl.'admin/booking/calendar/calendarsave';
+$_calendarUrl = $_baseUrl.'admin/booking/calendar/calendar';
+$_calendareditUrl = $_baseUrl.'admin/booking/calendar/calendaredit';
+
+$calendaritems = $block->getRoomPriceItems()->getData();
+$caljson = json_encode($calendaritems);
+
+?>
+<form id="booking-update-calendar" method="post" action="/">
+	<input type="hidden" name="booking_id" id="booking-id" value="<?php echo $bookingId; ?>" />
+	<input id="calendar-id" type="hidden" name="calendar_id" value="<?php echo $calendarId; ?>" />
+	<input type="hidden" name="booking_type" value="<?php echo $bookingType; ?>" />
+	<input type="hidden" name="sku" id="product_sku" value="" />
+	<!-- <input type="hidden" name="ok_calendar" value="<?php //echo $okCalendar; ?>" /> -->
+	<div class="add-calendar-field">
+		<label><?php echo __('Start Date'); ?></label>
+		<input id="item-day-start-date" type="text" name="item_day_start_date" value="<?php if (isset($param['check_in'])) {echo $param['check_in'];} else { echo $bookingitems->getCalendarStartdate(); } ?>" />
+	</div>
+	<div class="add-calendar-field">
+		<label><?php echo __('End Date'); ?></label>
+		<input id="item-day-end-date" type="text" name="item_day_end_date" value="<?php if (isset($param['check_out'])) {echo $param['check_out'];} else { echo $bookingitems->getCalendarEnddate(); } ?>" />
+	</div>
+	<input id="temp-start-date" type="hidden" name="temp_start_date" value="<?php echo $bookingitems->getCalendarEnddate();; ?>" />
+	<input id="temp-end-date" type="hidden" name="temp_end_date" value="<?php echo $bookingitems->getCalendarEnddate();; ?>" />
+
+	<div class="add-calendar-field">
+		<label><?php echo __('Status'); ?></label>
+		<select id="item-day-status" name="item_day_status">
+			<option <?php echo $bookingitems->getCalendarStatus() == 'available' ? 'selected="selected"' : ''; ?> value="available"><?php echo __('Available'); ?></option>
+			<!-- <option <?php //echo $bookingitems->getCalendarStatus() == 'special' ? 'selected="selected"' : ''; ?> value="special"><?php //echo __('Special'); ?></option>
+			<option <?php //echo $bookingitems->getCalendarStatus() == 'block' ? 'selected="selected"' : ''; ?> value="block"><?php //echo __('Block'); ?></option>
+			<option <?php //echo $bookingitems->getCalendarStatus() == 'unavailable' ? 'selected="selected"' : ''; ?> value="unavailable"><?php //echo __('Unavailable'); ?></option> -->
+			<option <?php echo $bookingitems->getCalendarStatus() == 'booked' ? 'selected="selected"' : ''; ?> value="booked"><?php echo __('Booked'); ?></option>
+		</select>
+	</div>
+	<div class="add-calendar-field">
+		<label><?php echo __('Qty'); ?></label>
+		<input id="item-day-qty" type="text" name="item_day_qty" value="<?php echo $bookingitems->getCalendarQty(); ?>" />
+	</div>
+	<div class="add-calendar-field">
+		<label><?php echo __('Price'); ?></label>
+		<input id="item-day-price" type="text" name="item_day_price" value="<?php echo $bookingitems->getCalendarPrice(); ?>" />
+	</div>
+	<div class="add-calendar-field">
+		<label><?php echo __('Special Price'); ?></label>
+		<input id="item-day-promo" type="text" name="item_day_promo" value="<?php echo $bookingitems->getCalendarPromo(); ?>" />
+	</div>
+	<div class="add-calendar-field">
+		<label><?php echo __('Default Value'); ?></label>
+		<input id="item-day-default-value" type="checkbox" name="item_day_default_value" value="1" <?php echo $bookingitems->getCalendarDefaultValue() == 1 ? 'checked="checked"' : ''; ?> />
+	</div>
+	<div class="add-calendar-field">
+	<button	id="save-calendar" type="button"><?php echo $bookingitems->getCalendarId() > 0 ? __('Update Item') : __('Save Price'); ?></button>
+	<button type="button" id="form-update-calendar-close"><?php echo __('Close'); ?> </button>
+	</div>
+</form>
+<script>
+require([
+	'jquery',
+	'Magento_Ui/js/modal/alert',
+	'booking_calendar'
+],
+function($, alert,bookingCalendar) {
+	var strFormatDate = 'yy-mm-dd';
+	var bookingCurrentDate = '<?php echo $bookingcurrentdate; ?>';
+	var bookingId = '<?php echo $bookingId;?>';
+	var bookingType = '<?php echo $bookingType;?>';
+	var bookingcurrencysymbol = '<?php echo $currencysymbol; ?>';
+	var sku = $('[name="product[sku]"]').val();
+					
+	 if(!sku)
+		{
+			alert({
+				title: 'Error Message',
+				content: '<?php echo __(' Please fill the product sku') ?>'
+			});
+			return false;
+		}
+		$('#product_sku').val(sku);
+	//jquery UI
+	$("#item-day-start-date,#item-day-end-date").datepicker(
+	{ 
+		minDate : new Date(bookingCurrentDate),
+		dateFormat: strFormatDate,
+		changeMonth : true,
+		onSelect: function( selectedDate, inst) 
+		{
+			var date = jQuery.datepicker.parseDate(inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat, selectedDate, inst.settings);
+			var dateText = jQuery.datepicker.formatDate("yy-mm-dd", date, inst.settings);
+			if(this.id == "item-day-start-date"){															
+				date.setDate(date.getDate());
+				jQuery("#item-day-end-date" ).datepicker(  "option", "minDate", date );
+				$('#temp-end-date').val(dateText);
+			}
+			else
+			{
+				$('#temp-start-date').val(dateText);
+			}
+		}
+	});
+
+	$('#save-calendar').click(function(){
+		$('.booking-calendar-item').css('background','none');
+
+		var startdate = $("#item-day-start-date").val();
+		var endate = $("#item-day-end-date").val();
+		var calendarId = $('#calendar-id').val();
+		var caljson = '<?php echo $caljson; ?>';
+		var sku = '<?php echo $sku; ?>';
+		var strRowItemId = '';
+		var defaultValue = 2;
+		var flag = '';
+
+		if($('#item-day-default-value').is(":checked"))
+		{
+			var defaultValue = 1;
+		}
+		else
+		{
+			if($.trim($('#item-day-start-date').val()) == '' || $.trim($('#item-day-end-date').val()) == '')
+			{
+				 alert({
+					title: '',
+					content: '<?php echo __('Please enter check in and check out') ?>'
+				});
+				return false;
+			}
+		}
+        var result = $.parseJSON(caljson);
+		if(result.length>0)
+		{ 
+		    for (var i=0 ; i<result.length; i++) {
+		    	var objstartdate = result[i]['calendar_startdate'];
+		    	var objenddate = result[i]['calendar_enddate'];	
+		    	var objbooking = result[i]['calendar_booking_id'];
+		       if (result[i]['calendar_default_value'] == 2) {
+		    	if (((startdate>=objstartdate && startdate<=objenddate) || (endate>=objstartdate && endate<=objenddate)) && (calendarId != result[i]['calendar_id'])) {
+		    		flag = true;
+					strRowItemId = result[i]['calendar_id'];
+					break;
+		    	} else {
+		    		flag = false;
+		    		continue;
+		    	}
+		       }
+		    }
+		} 
+		if($.trim($('#item-day-price').val()) == '')
+		{
+			 alert({
+					title: '',
+					content: '<?php echo __('Please Enter Price') ?>'
+				});
+			return false;
+		}
+		if($.trim($('#item-day-qty').val()) == '')
+		{
+			 alert({
+					title: '',
+					content: '<?php echo __('Please Enter Qty') ?>'
+				});
+			return false;
+		}
+		if(flag == true)
+		{
+			$('#booking-calendar-item-'+strRowItemId).css('background','red');
+			 alert({
+					title: '',
+					content: '<?php  echo __('You are adding new pricing but that Item already in database. Please see list Items on top and edit that item.') ?>'
+				});
+			return false;
+		}
+		$('#add-new-calendar').css('display','block');		
+		$.ajax({
+			url : '<?php echo $_calendarsaveUrl; ?>',
+			dataType: 'json',
+			type: 'POST',
+			data : $('#booking-update-calendar').serialize(),
+			success : function(res)
+			{
+				if(res.status == true)
+				{
+					$('#booking-list-calendar-items').html(res.html_calendar_items);
+				    var objData = {
+						'DataURL' : '<?php echo $_calendarUrl; ?>',
+						'booking_id': bookingId,
+						'booking_type' : bookingType,
+						'booking_sku' : sku,
+						'url_add_item' : '<?php echo $_calendareditUrl; ?>',
+						'currency': bookingcurrencysymbol,
+						'str_current_date': bookingCurrentDate,
+						'booking_label' : '<?php echo __('Booking Calendar'); ?>',
+						'obj_status_text' : {
+							'available': '<?php echo __('Available'); ?>',
+							'special': '<?php echo __('Available'); ?>',
+							'block': '<?php echo __('Block'); ?>',
+							'unavailable': '<?php echo __('Unavailable'); ?>',
+							'booked': '<?php echo __('Booked'); ?>',
+							},
+							'name_day_th' : [
+														'<?php echo __('Sunday'); ?>',
+														'<?php echo __('Monday'); ?>',
+														'<?php echo __('Tuesday'); ?>',
+														'<?php echo __('Wednesday'); ?>',
+														'<?php echo __('Thursday'); ?>',
+														'<?php echo __('Friday'); ?>',
+														'<?php echo __('Saturday'); ?>'
+												],
+							'name_day_short_th' : [
+															'<?php echo __('Mon'); ?>',
+															'<?php echo __('Tue'); ?>',
+															'<?php echo __('Wed'); ?>',
+															'<?php echo __('Thu'); ?>',
+															'<?php echo __('Fri'); ?>',
+															'<?php echo __('Sat'); ?>',
+															'<?php echo __('Sun'); ?>'
+														],
+							'name_day_shortest_th' : [
+														'<?php echo __('Su'); ?>',
+														'<?php echo __('Mo'); ?>',
+														'<?php echo __('Tu'); ?>',
+														'<?php echo __('We'); ?>',
+														'<?php echo __('Th'); ?>',
+														'<?php echo __('Fi'); ?>',
+														'<?php echo __('Sa'); ?>',
+														],
+						'add_text' : '<?php echo __('Add'); ?>',
+						'remove_text' : '<?php echo __('Remove'); ?>',
+						'next_text' : '<?php echo __('Next'); ?>',
+						'pre_text' : '<?php echo __('Pre'); ?>',
+					}
+					$('#booking-calendar').CedAnyBooking(objData); 
+					$('#form-booking-calendar').html(''); 
+					alert({
+						title: '',
+						content: '<?php echo __('Data have been saved success') ?>'
+					});
+				}
+				
+				else
+				{
+					alert({
+						title: '',
+						content: '<?php //echo __('System are errors, Please check again!') ?>'
+					});
+				}
+				
+			},
+			error : function()
+			{
+				alert({
+						title: '',
+						content: '<?php echo __('System are errors, Please check again!') ?>'
+					});
+			 }
+	});
+});
+$('#form-update-calendar-close').click(function(){
+		$('#form-booking-calendar').html('');
+		$('#add-new-calendar').css('display','block');
+	});
+});
+
+</script>

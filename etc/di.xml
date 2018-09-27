@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!--
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author      CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Helper\Product\ConfigurationPool">
+        <arguments>
+            <argument name="instancesByType" xsi:type="array">
+                <item name="bundle" xsi:type="object">Ced\Booking\Helper\Catalog\Product\Configuration</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Checkout\Controller\Cart\Add" type="Ced\Booking\Controller\Booking\Checkout\Cart\Add" />
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="update_cart" type="Ced\Booking\Helper\UpdateCart"/>
+    </type>
+    <preference for="Magento\Catalog\Block\Product\ListProduct" type="Ced\Booking\Block\Product\CedListProduct" />
+
+    <preference for="Magento\Sales\Controller\Order\Reorder" type="Ced\Booking\Controller\Order\Reorder" />
+</config>

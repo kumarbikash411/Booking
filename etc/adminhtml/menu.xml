@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
+	<menu>
+		<add id="Ced_Booking::booking" title="Booking" module="Ced_Booking"
+			sortOrder="50" resource="Ced_Booking::booking" dependsOnConfig="booking/booking_config/enable" />
+		<add id="Ced_Booking::booking_dashboard" title="Dashboard"
+			module="Ced_Booking" sortOrder="10" parent="Ced_Booking::booking"
+			action="booking/dashboard/index" resource="Ced_Booking::booking_dashboard" />
+		<add id="Ced_Booking::booking_orders" title="Orders"
+			module="Ced_Booking" sortOrder="20" parent="Ced_Booking::booking"
+			action="booking/order/index" resource="Ced_Booking::booking_orders" />
+		<add id="Ced_Booking::booking_product" title="Products"
+			module="Ced_Booking" sortOrder="30" parent="Ced_Booking::booking"
+			action="booking/products/index" resource="Ced_Booking::booking_product" />
+		<add id="Ced_Booking::booking_location" title="Locations"
+			module="Ced_Booking" sortOrder="40" parent="Ced_Booking::booking"
+			action="booking/location/index" resource="Ced_Booking::booking_location" />
+		<add id="Ced_Booking::booking_room_category" title="Room Categories"
+			module="Ced_Booking" sortOrder="50" parent="Ced_Booking::booking"
+			action="booking/roomtype/roomcategorygrid" resource="Ced_Booking::booking_room_category" />
+		<add id="Ced_Booking::booking_room_types" title="Room Types"
+			module="Ced_Booking" sortOrder="60" parent="Ced_Booking::booking"
+			action="booking/roomtype/index" resource="Ced_Booking::booking_room_types" />
+		<add id="Ced_Booking::booking_facilities" title="Facilities"
+			module="Ced_Booking" sortOrder="70" parent="Ced_Booking::booking"
+			action="booking/facilities/index" resource="Ced_Booking::booking_facilities" />
+		<add id="Ced_Booking::booking_settings" title="Settings"
+			module="Ced_Booking" sortOrder="80" parent="Ced_Booking::booking"
+			action="adminhtml/system_config/index/" resource="Ced_Booking::booking_settings" />
+	</menu>
+</config>
+
+
+
+
+

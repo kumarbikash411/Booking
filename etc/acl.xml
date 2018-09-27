@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_CsMarketplace
+ * @author 		CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Ced_Booking::booking" title="Booking System" sortOrder="30">
+                    <resource id="Ced_Booking::booking_dashboard" title="Booking Dashboard" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_product" title="Booking Product" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_room_category" title="Booking Room Category" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_room_types" title="Booking Room Types" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_facilities" title="Booking Facilities" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_orders" title="Booking Orders" sortOrder="10" />
+                    <resource id="Ced_Booking::booking_location" title="Manage Booking Location" sortOrder="10" />
+                </resource>
+
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Ced_Booking::booking_settings" title="Booking System" />
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

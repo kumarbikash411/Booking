@@ -1,0 +1,232 @@
+<?php  
+      $currentAddress = json_encode($block->getCurrentAddress());
+      $currentProduct = $block->getCurrentProduct();
+      $allAddress = json_encode($block->getAllAddress());
+      //var_dump($allAddress); die;
+      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+      $dataHelper = $objectManager->create('Ced\Booking\Helper\Data');
+      $mapZoomValue = $dataHelper->getStoreConfigValue('booking/booking_config/map_zoom');
+      $mapApiKey = $dataHelper->getStoreConfigValue('booking/booking_config/map_api_key');
+      $zoom = $mapZoomValue !='' ? $mapZoomValue : 13;
+?>
+
+<div id="map" class="booking_product_map"></div>
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=<?php echo $mapApiKey; ?>&callback=initMap" async defer></script>
+
+<script>
+
+        var productName = "<?php echo $currentProduct->getName();?>";
+        //var currentAddress = '<?php echo $currentAddress; ?>';
+        var Mapzoom = "<?php echo $zoom; ?>";
+       // var address = JSON.parse(currentAddress);
+        var address = <?php echo $currentAddress; ?>; 
+        var parseAllAddress = <?php echo $allAddress; ?>;
+
+        document.getElementById('map').style.display = 'none';
+        booking_zoom = parseInt(Mapzoom);
+
+        document.on('change','[name="product[address]"]',function(){
+
+              var addressObj = {};
+
+              var value = document.getElementsByName('product[address]')[0].value;
+
+              if (value == ' ') {
+                document.getElementById('map').style.display = 'none';
+              } else {
+                document.getElementById('map').style.display = 'block';
+              }
+
+              if (parseAllAddress.length > 0) {
+
+                for (var i=0; i<parseAllAddress.length; i++) {
+                  if (parseAllAddress[i].id == value) {
+                    addressObj = { city : parseAllAddress[i].city,
+                                       state : parseAllAddress[i].state,
+                                       zip : parseAllAddress[i].zip,
+                                       country : parseAllAddress[i].country,
+                                       street_address : parseAllAddress[i].street_address
+
+
+                          };
+                  }
+                }
+              }
+              address = addressObj;
+
+              initMap();
+
+      });
+      function initMap() {   
+
+            var geocoder =  new google.maps.Geocoder();
+            geocoder.geocode( { 'address': address.street_address}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+
+                  lat = parseFloat(results[0].geometry.location.lat());
+                  lon = parseFloat(results[0].geometry.location.lng()); 
+    
+                } else {
+                  lat = 22.08672;
+                  lon = 79.42444;
+                }
+
+            var lat_lng = {lat: lat, lng: lon};      
+            map = new google.maps.Map(document.getElementById('map'), {      
+              zoom: booking_zoom,      
+              center: lat_lng,       
+            });
+            var contentString = address.street_address;
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+                 
+            
+            var marker = new google.maps.Marker({      
+              position: lat_lng,      
+              map: map      
+            });    
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+              });  
+              addCircle(lat_lng);      
+          });   
+        
+        }   
+
+        function addCircle(location) {      
+          
+            var cityCircle = new google.maps.Circle({      
+              strokeColor: '#FF0000',      
+              strokeOpacity: 0.8,      
+              strokeWeight: 2,      
+              fillColor: '#FF0000',      
+              fillOpacity: 0.35,      
+              map: map,      
+              center: location,      
+              radius: 1000,
+              draggable:false    
+            });   
+        }   
+    
+
+</script>
+
+<script>
+
+require([
+        'jquery'  
+        ],
+        function($) {
+
+          var map = setInterval(function() {
+            if ($('[name="product[address]"]').length > 0)  {
+
+              if ($('[name="product[address]"]').val() == '') {
+                  $('#map').hide();
+              }
+            }
+
+            clearInterval(map);
+          },1000);
+
+          var checkAppointmentTime = setInterval(function() {
+
+            if ($('[data-index="non_working_rule_header"]').length > 0)  {
+                $(document).on("focus", "[data-index='appointment_start_time'] div input", function(){
+                    $(this).timepicker({
+                              'timeFormat': 'hh:mm tt',
+                              'ampm': true,
+                               'disableTextInput': true
+                                                      
+                      });
+                });
+                $(document).on("focus", "[data-index='appointment_end_time'] div input", function(){
+
+                    $(this).timepicker({
+                              'timeFormat': 'hh:mm tt',
+                              'ampm': true,
+                               'disableTextInput': true
+                                                      
+                      });
+                });
+                clearInterval(checkAppointmentTime);
+            } 
+          },1000);
+
+          var hotelTime = setInterval(function(){
+
+            if ($('input[name="product[booking_check_in_time]"]').length > 0 && $('input[name="product[booking_check_out_time]"]').length > 0) {
+            }
+            clearInterval(hotelTime);
+
+          },1000);
+
+          var checkforaDay = setInterval(function() {
+
+            if ($('input[name="product[stock_qty_for_a_day]"]').length > 0 && $("input[name='product[booking_min_days]']").length > 0  && $("input[name='product[booking_max_days]']").length > 0) {
+
+                    $("input[name='product[stock_qty_for_a_day]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+                    $("input[name='product[booking_min_days]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+                    $("input[name='product[booking_max_days]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+             clearInterval(checkforaDay);
+           }
+           
+        }, 1000); 
+
+        var checkforanHour = setInterval(function() {
+
+            if ($("input[name='product[min_booking_hours]']").length > 0 && $("input[name='product[max_booking_hours]']").length > 0  && $("input[name='product[stock_qty_for_a_interval]']").length > 0) {
+
+                    $("input[name='product[stock_qty_for_a_interval]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+                    $("input[name='product[min_booking_hours]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+                    $("input[name='product[max_booking_hours]']").keyup(function(evt) {
+                           var self = $(this);
+                           self.val(self.val().replace(/\D/g, ''));
+                           if ((evt.which < 48 || evt.which > 57)) 
+                           {
+                             evt.preventDefault();
+                           }
+                    });
+             clearInterval(checkforanHour);
+           }
+           
+        }, 1000); 
+});
+
+</script>

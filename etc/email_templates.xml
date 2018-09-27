@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author 		CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <!-- <template id="booking_email_template_new" label="Booking Email" file="booking_email.html" type="html" module="Ced_Booking" area="adminhtml"/> -->
+    <template id="send_booking_email_to_admin_template" label="Booking Admin Email" file="booking_emailsendtoadmin.html" type="html" module="Ced_Booking" area="frontend"/>
+    <template id="send_booking_email_to_customer_template" label="Booking Customer Email" file="booking_emailsendtocustomer.html" type="html" module="Ced_Booking" area="frontend"/>
+    <template id="booking_notification_settings_notification_mail_template" label="Booking Email" file="booking_email.html" type="html" module="Ced_Booking" area="adminhtml"/>
+</config>

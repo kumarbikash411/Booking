@@ -1,0 +1,111 @@
+<?php 
+
+$currentAddress = json_encode($block->getCurrentAddress());
+$currentProduct = $block->getCurrentProduct();
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+$mapApiKey = $Datahelper->getStoreConfigValue('booking/booking_config/map_api_key');
+$mapMaxZoom = $Datahelper->getStoreConfigValue('booking/booking_config/map_zoom'); ?>
+
+	<?php /**********************Map for Booking Product********************/ ?>
+
+<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=<?php echo $mapApiKey; ?>&callback=initMap" async defer></script>
+<script> 
+
+     	var Mapzoom = "<?php echo $mapMaxZoom; ?>";
+     	var productName = "<?php echo $currentProduct->getName();?>";
+     	
+
+     	var lat = '';
+     	var lon = '';
+
+     	var address = <?php echo $currentAddress; ?>;
+
+ 		var contentString = "<div>";
+ 		contentString += "<div><h3>"+productName+"</h3><div>";
+
+		if (address.street_address != '') {
+
+			 contentString += "<div><span class='map_info_window_label'>Address: </span><span>"+address.street_address+"</span></div>";
+		}
+		if (address.city != '') {
+
+			 contentString += "<div><span class='map_info_window_label'>City: </span><span>"+address.city+"</span></div>";
+		}
+		if (address.state != '') {
+
+			 contentString += "<div><span class='map_info_window_label'>State: </span><span>"+address.state+"</span></div>";
+		}
+		if (address.country != '') {
+
+			 contentString += "<div><span class='map_info_window_label'>Country: </span><span>"+address.country+"</span></div>";
+		}
+		if (address.zip != '') {
+
+			 contentString += "<div><span class='map_info_window_label'>Zip code: </span><span>"+address.zip+"</span></div>";
+		}
+
+ 		contentString += '</div>';
+
+     	if (Mapzoom == '') {
+          booking_zoom = 13;
+        } else {
+        	booking_zoom = parseInt(Mapzoom);
+        }
+		 
+		function initMap() {   
+
+           	var geocoder =  new google.maps.Geocoder();
+		   	geocoder.geocode( { 'address': address.city+', '+address.state}, function(results, status) {
+		          if (status == google.maps.GeocoderStatus.OK) {
+
+		            lat = parseFloat(results[0].geometry.location.lat());
+		            lon = parseFloat(results[0].geometry.location.lng()); 
+	
+		          } else {
+		            lat = 22.08672;
+		            lon = 79.42444;
+		          }
+
+		      var lat_lng = {lat: lat, lng: lon};      
+		      map = new google.maps.Map(document.getElementById('map'), {      
+		        zoom: booking_zoom,      
+		        center: lat_lng,       
+		      });  
+
+
+		      	var infowindow = new google.maps.InfoWindow({
+		          content: contentString
+		        });
+		           
+		      
+		      var marker = new google.maps.Marker({      
+		        position: lat_lng,      
+		        map: map      
+		      });    
+		      marker.addListener('click', function() {
+		          infowindow.open(map, marker);
+		        });  
+		        addCircle(lat_lng);      
+		    });   
+      
+    	}   
+
+    	function addCircle(location) {      
+        
+	        var cityCircle = new google.maps.Circle({      
+	          strokeColor: '#FF0000',      
+	          strokeOpacity: 0.8,      
+	          strokeWeight: 2,      
+	          fillColor: '#FF0000',      
+	          fillOpacity: 0.35,      
+	          map: map,      
+	          center: location,      
+	          radius: 16093,    
+	          draggable:false    
+	        });   
+	    }   
+        
+</script>
+
+<div id="map" style="width:100%;height:500px"></div>

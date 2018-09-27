@@ -1,0 +1,199 @@
+<?php
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the 
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category  Ced
+ * @package   Ced_Booking
+ * @author    CedCommerce Magento Core Team <Ced_MagentoCoreTeam@cedcommerce.com>
+ * @copyright Copyright CedCommerce (http://cedcommerce.com/)
+ * @license   http://cedcommerce.com/license-agreement.txt  
+ * 
+ */
+
+?>
+
+
+<?php
+
+ $room_id=$this->getRequest()->getParam('Room_Id');
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$excludedaysCollection=$objectManager->create('Ced\Booking\Model\RoomExcludeDays')->getCollection()->addFieldToFilter('room_id',$room_id)->getData();
+$data = json_encode($excludedaysCollection);
+
+?>
+
+
+<fieldset id="edit-room-exclude-days-block" class="fieldset">
+
+    <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Manage Exclude Days)') ?></span></legend>
+
+    <div id="manage-edit-exclude-days-panel" >
+
+        <table class="admin__control-table">
+
+            <thead>
+
+                <tr id="days-options-table">
+
+                    <th class="col-draggable"></th>
+
+                    <th class="col-default control-table-actions-th"><?php echo __('Check-In');?></th>
+                    <th class="col-default control-table-actions-th"><?php echo __('Check-Out');?></th>
+                    <!-- <th class="col-default control-table-actions-th"><?php //echo __('To-period');?></th> -->
+
+                    <th class="col-delete">&nbsp;</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody data-role="edit-exclude-days-options-container" class="ignore-validate">            
+            </tbody>
+            <tfoot>
+
+            <tr>
+
+                <th colspan="<?php /* @escapeNotVerified */ //echo $storetotal; ?>" class="col-actions-add">
+
+                    <?php // if (!$block->getReadOnly() && !$block->canManageOptionDefaultOnly()):?>
+
+                        <button id="edit_room_add_new_days_button" title="<?php /* @escapeNotVerified */ echo __('Add Option'); ?>"
+
+                            type="button" class="action- scalable add">
+
+                             <span><?php /* @escapeNotVerified */ echo __('Add Option'); ?></span>
+
+                        </button>
+
+                    <?php //endif; ?>
+
+                </th>
+
+            </tr>
+
+            <tr>
+
+               
+
+            </tr>
+
+            </tfoot>
+
+        </table>
+
+        <input type="hidden" id="option-count-check" value="" />
+
+    </div>
+
+    <script id="edit-exclude-days-row-template" type="text/x-magento-template">
+    
+
+         <tr>
+
+            <td class="col-draggable">
+
+                <?php if (!$block->getReadOnly() && !$block->canManageOptionDefaultOnly()): ?>
+
+                    <div data-role="draggable-handle" class="draggable-handle" title="<?php /* @escapeNotVerified */ echo __('Sort Option'); ?>"></div>
+
+                <?php endif; ?>
+
+                <input data-role="order" type="hidden" name="option[order][<%- data.id %>]"  value="<%- data.sort_order %>" <?php if ($block->getReadOnly() || $block->canManageOptionDefaultOnly()): ?> disabled="disabled"<?php endif; ?>/>
+
+            </td>
+
+                <!-- <td class="col-default control-table-actions-cell">
+
+                    <input class="input-radio" type="<%- data.intype %>" name="default[]" value="<%- data.id %>" <%- data.checked %><?php //if ($block->getReadOnly()):?>disabled="disabled"<?php //endif;?>/>
+
+                </td> -->
+
+                <td class="col-default control-table-actions-cell">
+                    <input name="exclude_days_check_in_<%- data.id %>" value="<%- data.day_start %>" class="input-text edit-room-exclude-days-check-in" readonly="true"/>
+                </td>
+
+                <td class="col-default control-table-actions-cell">
+                    <input name="exclude_days_check_out_<%- data.id %>" value="<%- data.day_end %>" class="input-text edit-room-exclude-days-check-out" readonly="true"/>
+                </td>
+
+
+
+                <!-- <td class="col-default control-table-actions-cell">
+                    <input tye="text" name="to-period" value="" class="input-text to-date"/>
+                </td> -->
+
+                <td id="delete_button_container_<%- data.id %>" class="col-delete">
+
+                    <input type="hidden" class="delete-flag" name="option[delete][<%- data.id %>]" value="" />
+
+                    <?php //if (!$block->getReadOnly() && !$block->canManageOptionDefaultOnly()):?>
+
+                        <button id="delete_button_<%- data.id %>" title="<?php /* @escapeNotVerified */ echo __('Delete') ?>" type="button"
+
+                            class="action- scalable delete delete-option"
+
+                            >
+
+                            <span><?php /* @escapeNotVerified */ echo __('Delete') ?></span>
+
+                        </button>
+
+                    <?php //endif;?>
+
+                </td>
+           
+
+        </tr>
+
+    </script>
+
+   <?php
+
+      if(count($excludedaysCollection)!=0) { 
+         foreach ($excludedaysCollection as $days) { 
+
+             $values[] = [ 'checked'=>'',
+                           'intype' => 'radio',
+                           'id' => $days['id'],
+                           'sort_order' =>$days['id'],
+                           'day_start' => date("m/d/Y", strtotime($days['day_start'])),
+                           'day_end' => date("m/d/Y", strtotime($days['day_end']))
+                         ];
+         }
+     } else {
+        $values = [];
+    }
+?>
+
+    
+
+    <script type="text/x-magento-init">
+
+        {
+
+            "*": {
+
+                "Ced_Booking/js/edit_room_exclude_days": {
+
+                    "attributesData":<?php /* @noEscape */ echo json_encode($values, JSON_HEX_QUOT); ?>,
+
+                    "isSortable":  <?php echo (int)(!$block->getReadOnly() && !$block->canManageOptionDefaultOnly()) ?>,
+
+                    "isReadOnly": <?php echo (int)$block->getReadOnly(); ?>
+
+                }
+
+            }
+
+        }
+
+    </script>
+</fieldset>

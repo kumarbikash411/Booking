@@ -1,0 +1,135 @@
+<?php $image = $block->getConfigBanner();
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+	  $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+							   ->getStore()
+                               ->getBaseUrl();
+      $urlsearch = $_baseUrl.'booking/booking/searchbooking';
+	  $helper = $objectManager->create('Ced\Booking\Helper\Booking\Image');
+	  $Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+	  $configwidth = $Datahelper->getStoreConfigValue('booking/banner_setting/banner_width');
+	  $configheight = $Datahelper->getStoreConfigValue('booking/banner_setting/banner_height');
+	  $placeholder = $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');
+	  $width = $configwidth != ''? $configwidth : 800;
+	  $height= $configheight != ''? $configheight : 200; ?>
+<div>
+	<p>
+		<img id="booking-banner"
+	         src="<?php echo $helper->resize($image,$width,$height,$placeholder);  ?>"
+	          alt="Booking Banner" height="100%" width="100%" />
+	</p>
+	<div>
+		<form id="search-form">
+			<input type="hidden" value="" name="address" id="address"></input>
+			<div>
+				<div>
+					<i class="fa fa-map-marker input-icon"></i>
+					<input id="searchByaddress" name="search_by_address" type="text" placeholder="Where" value="">
+				</div>
+				<div>
+					<div>
+						<div>
+							<i class="fa fa-calendar input-icon input-icon-highlight"></i>
+							<input type="text" id="check-in" name="check_in" placeholder="check-in" value="" class="form-control" readonly="true">
+						</div>
+						<div>
+							<i class="fa fa-calendar input-icon input-icon-highlight"></i>
+							<input type="text" id="check-out" name="check_out" placeholder="check-out" value=""class="form-control" readonly="true">
+						</div>
+					</div>
+				</div>
+				<div>
+					<select id="searchbyrooms" name="search_by_rooms">
+						<option value="">--select room--</option>
+						<?php for ($i=1; $i<=10; $i++) { ?>
+							<option value="<?php echo $i;?>"><?php echo $i;?></option>
+						<?php } ?>
+					</select>
+				</div>
+				<div>
+					<input type="button" id="search-button" class="primary" value="Search"></input>
+				</div>				
+			</div>
+		</form>
+		<div id="product-lists">
+			<?php echo $this->getLayout()->createBlock('Ced\Booking\Block\BookingFilter')->setTemplate('Ced_Booking::filter.phtml')->toHtml();?>
+		</div>
+		<div id="searched-product-lists"></div>
+	</div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&language=en"></script>
+
+<script>
+	require([
+		'jquery',
+		"jquery/ui"
+		],
+		function ($){
+
+			 var input = document.getElementById('searchByaddress');
+     		 var autocomplete = new google.maps.places.Autocomplete(input,{types: ['(cities)']});
+      		google.maps.event.addListener(autocomplete, 'place_changed', function(){
+         		var place = autocomplete.getPlace();
+         		document.getElementById('address').value = place.address_components[0].long_name;
+
+      		});
+
+			// $("#check-in").hover(function(){
+			//    	$("#check-in" ).calendar({
+			//    		dateFormat: "yy-mm-dd",
+			//    	});
+			// });
+		 //    $("#check-out").hover(function(){
+		 //   	 	$("#check-out" ).calendar({
+		 //   			dateFormat: "yy-mm-dd",
+		 //   		});
+		 //    });
+		 var dateToday = new Date();
+		    $( "#check-in, #check-out" ).datepicker({
+				minDate: dateToday,
+				dateFormat: "yy-mm-dd",
+				onSelect: function( selectedDate, inst) {
+					var date = jQuery.datepicker.parseDate(inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat, selectedDate, inst.settings);
+					var dateText = jQuery.datepicker.formatDate("yy-mm-dd", date, inst.settings);
+					if(this.id == "check-in"){										
+						date.setDate(date.getDate() + 1);
+						jQuery("#check-out" ).datepicker( "option", "minDate", date );
+					}
+				}
+			});
+
+		    /* on click search button */
+
+		 //    setTimeout(function(){
+
+			//     $('#search-button').click(function(){
+			//     	if ($('#searchByaddress').val()=='') {
+			//     		alert('Please enter location');
+			//     	} 
+			//     	if ($('#check-in').val() == '') {
+			//     		alert('Please select check-in date')''
+			//     	}
+			//     	if ($('#check-out').val() == '') {
+			//     		alert('Please select check-out date')''
+			//     	}
+			//     	$.ajax({
+	  //  					url : '<?php echo $urlsearch; ?>',
+	  //  					dataType : 'json',
+	  //  					type : 'POST',
+	  //  					data : $('#search-form').serialize(),
+	  //  					showLoader: true,
+	  //  					success : function(res)
+	  //  					{
+	  //  						$('#product-lists').hide();
+	  //  						$('#searched-product-lists').html(res.template);
+	  //  					},
+	  //  					error : function()
+	  //  					{
+
+	  //  					}
+	  //  				}); 
+			//     });
+			// },1000);
+		});
+</script>

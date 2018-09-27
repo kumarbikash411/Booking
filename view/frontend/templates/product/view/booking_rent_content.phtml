@@ -1,0 +1,133 @@
+
+<?php $bookingfacilities = $block->getBookingTypeRentFacilities();
+      $currentdate = $block->getcurrentdate();
+      $booking_product_id = $block->getProductId();
+      $booking_type = $this->getBookingType();
+      $settings = $block->getConfigData();
+      $Catalogproduct = $block->getProduct();
+      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+      $Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+      $mapApiKey = $Datahelper->getStoreConfigValue('booking/booking_config/map_api_key');
+      $mapMaxZoom = $Datahelper->getStoreConfigValue('booking/booking_config/map_zoom');
+      $isCalendarEnable = $Datahelper->getStoreConfigValue('booking/booking_config/show_calendar');
+    
+      $attribute_set_name = $this->_objectManager->create('Magento\Eav\Model\Entity\Attribute\Set')->load($this->getProduct()->getAttributeSetId())->getAttributeSetName();
+      $calendarUrl = $this->getUrl('booking/booking/checkCalendarBooking');
+      if($attribute_set_name == 'Hourly Rent Booking')
+      {
+          $calendarUrl = $this->getUrl('booking/booking/checkHourlyCalendarBooking');
+      }
+
+
+?>
+<h3><?php echo __('Facilities');  ?></h3>
+<div id="facility-wrapper">
+    <div class="span12">
+        <div id="owl-demo-rent-daily" class="owl-carousel">
+          <?php if ($bookingfacilities!='') :
+              			foreach ($bookingfacilities as $val) :
+              				 ?>
+			           <div class="item">
+			                 <?php if (preg_match('/fa-/',$val->getImage()) || preg_match('/im-/',$val->getImage())) { 
+
+			                    		$icon_class = explode('-', $val->getImage() ); 
+										          $type_font = $icon_class[0]; ?>
+
+										        <i title="<?php echo $val->getTitle();?>" class="ace-icon <?php echo $type_font.' '; ?><?php echo $val->getImage(); ?> fa-5x" ></i>
+			                    	<?php } elseif ($val->getImage() == '') { ?>
+			                    		<img title="<?php echo $val->getTitle();?>" id="facilityModal<?php echo $val->getId();?>" width="50px" src="<?php echo $this->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');?>" alt="<?php echo $val->getTitle();?>">
+                              <!-- facility image Modal -->
+                              <div id="facilityModal<?php echo $val->getId();?>" class="facility-modal">
+                                <span class="facility-img-close">&times;</span>
+                                <img class="facility-modal-content" id="facility_modal_img<?php echo $val->getId();?>">
+                                <div class="facility-caption" id="facility_caption<?php echo $val->getId();?>"></div>
+                              </div>
+			                    	<?php } else { ?>
+			                    		<img title="<?php echo $val->getTitle();?>" id="facilityModal<?php echo $val->getId();?>" width="50px" src="<?php echo $block->getUrl().'pub/media/'.$val->getImage();?>" alt="<?php echo $val->getTitle();?>">
+                              <!-- facility image Modal -->
+                              <div id="facilityModal<?php echo $val->getId();?>" class="facility-modal">
+                                <span class="facility-img-close">&times;</span>
+                                <img class="facility-modal-content" id="facility_modal_img<?php echo $val->getId();?>">
+                                <div class="facility-caption" id="facility_caption<?php echo $val->getId();?>"></div>
+                              </div>
+			                    	<?php } ?>
+
+			                    	<div class="facility-desciption"><?php echo $val->getDescription();?></div>
+			         </div>
+              	<?php //endif;
+              		  endforeach;
+                    else : ?>
+                    <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('No Facilities in this Product.'); ?></span></div>
+              	<?php endif;
+          ?>
+        </div>
+    </div>
+</div>
+
+<script>
+
+require([
+    'jquery'
+    ],
+function ($){
+  var modal = $('[id^=facilityModal]');
+  var img =  $('[id^=zoom-facility-image]');
+  var modalImg = $("[id^=facility_modal_img]");
+  var captionText = $("[id^=facility_caption]");
+
+  img.click(function(e){
+      modal.show();
+      modalImg.attr('src',$(this).attr('src'));
+      captionText.html($(this).alt);
+  });
+
+  $('.facility-img-close').click(function(e){
+    modal.hide();
+  });
+});
+
+</script>
+<?php if($isCalendarEnable) : ?>
+<div class="col-2">
+  <div>
+    <h3><?php /* @escapeNotVerified */ echo __('Booking Availability'); ?></h3>
+      <div id='booking_calendar'></div>
+  </div>  
+</div>
+
+<script>
+
+require([
+    'jquery',
+    'ced_fullcalendar'
+    ], function($, fullCalendar){ 
+
+    $('#booking_calendar').fullCalendar({
+      editable: false,
+      eventLimit: true, 
+      dragScroll:false,
+      cache: true,
+      
+
+       eventSources: [
+        {
+            url: '<?php echo $calendarUrl; ?>',
+            type: 'POST',
+            showLoader: true,
+            cache: true,
+            data: {
+                product_id: '<?php echo $this->getProductId() ?>',
+                max_qty: '<?php echo $this->getProduct()->getStockQtyForADay() ?>',
+                attribute_set_id: '<?php echo $this->getProduct()->getAttributeSetId() ?>',
+            },
+            error: function() {
+                alert('there was an error while fetching events!');
+            },
+            
+        }
+
+    ]
+    });
+  });
+</script>
+<?php endif; ?>

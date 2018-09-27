@@ -1,0 +1,45 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="room-edit-modal"></div>
+<div class="action-select-wrap" data-bind="
+    css : {
+        '_active' : $parent.actionsListOpened() === $record().index
+    },
+    outerClick: $parent.closeList.bind($parent, $record().index)"
+>
+    <button class="action-select" data-bind="click: function(){ $parent.toggleActionsList($record().index); }">
+        <span data-bind="i18n: 'Select'"></span>
+    </button>
+    <ul class="action-menu _active" data-bind="css: {'_active': $parent.actionsListOpened() === $record().index}">
+         <li class="edit_room_btn">
+            <a class="action-menu-item" data-bind="
+                click: function(){
+                    $parent.openModalWithRoomsData($record().index);
+                    $parent.closeList($record().index);
+                }
+            ">Edit Room</a>
+        </li>
+        <!-- <li>
+            <a class="action-menu-item" data-bind="
+                text: $data.value() == 1 ? $t('Disable Room') : $t('Enable Room'),
+                click: function(){
+                    $parent.toggleStatusProduct($record().index);
+                    $parent.closeList($record().index);
+                }
+            "></a>
+        </li> -->
+        <li>
+            <a class="action-menu-item" data-bind="
+                click: function(){
+                    $parent.closeList($record().index);
+                    $parent.processingDeleteRecord($record().index, $record().recordId);
+                },
+                text: $t('Remove Room')
+            "></a>
+        </li>
+    </ul>
+</div>

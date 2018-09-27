@@ -1,0 +1,68 @@
+<?php 	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+		$registry = json_encode($block->getRegistryData()->getData());
+	  	$_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+	  	$_gerRegionUrl = $_baseUrl.'admin/booking/location/regionlist'; ?>
+
+
+<script type="text/javascript">
+    require([
+             'jquery',
+             'mage/template',
+             'jquery/ui',
+             'mage/translate'
+         ],
+         function($, mageTemplate) {
+
+         	var result = <?php echo $registry; ?>;
+         	
+ 			if (result.country) {
+ 				var country = result.country;
+ 				$.ajax({
+					url: '<?php  echo $_gerRegionUrl; ?>',
+					dataType : 'json',
+					type: 'POST',
+					data: {country_id:country,region:result.state},
+					showLoader: true,
+					success : function(res)
+					{
+						if (res.hasstate == 1) {
+							$('[data-index="region"]').hide();
+							$('[data-index="region_id"]').show();
+							$('[data-index="region_id"] div select').html(res.htmlconent);
+						}
+						if (res.hasstate == 0) {
+							$('[name="booking_location[region]"]').show();
+							$('[name="booking_location[region]"]').val(result.state);
+							$('[data-index="region_id"]').hide();
+						}
+					}
+				});
+ 			}
+         	$('[data-index="region_id"]').hide();
+
+          $(document).on('change','[name="booking_location[country]"]', function(){
+         		
+         		$.ajax({
+					url: '<?php  echo $_gerRegionUrl; ?>',
+					dataType : 'json',
+					type: 'POST',
+					data: {country_id:$('[name="booking_location[country]"]').val()},
+					showLoader: true,
+					success : function(result)
+					{
+						if (result.hasstate == 1) {
+							$('[data-index="region"]').hide();
+							$('[data-index="region_id"]').show();
+							$('[data-index="region_id"] div select').html(result.htmlconent);
+						}
+						if (result.hasstate == 0) {
+							$('[data-index="region"]').show();
+							$('[data-index="region_id"]').hide();
+						}
+					}
+				});
+         	});
+    });
+    </script>      

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author 		CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+		<css src="Ced_Booking::css/icomoon.css" />
+		<css src="Ced_Booking::css/font-awesome.css" />
+		<css src="Ced_Booking::css/font-awesome.min.css" />
+		<css src="Ced_Booking::css/booking-custom.css" />
+		<css src="Ced_Booking::css/owl.carousel.css" rel="stylesheet"/>
+    	<css src="Ced_Booking::css/owl.css" rel="stylesheet"/>
+    	<css rel="stylesheet" src="Ced_Booking::css/owl.theme.css"/>
+    	<script src="Ced_Booking::js/jquery-1.9.1.min.js"></script>
+    	<script src="Ced_Booking::js/owl.carousel.js"/>
+		<css src="Ced_Booking::css/fullcalendar.min.css" />
+	</head>
+	<body>
+		<referenceBlock name="product.info.addtocart" remove="true"/>
+		<referenceBlock name="product.info.details">
+			<block class="Ced\Booking\Block\Product\View\ExtraTabs" name="product.info.booking.policy" template="product/view/booking_policy.phtml" group="detailed_info">
+				<arguments>
+					<argument name="title" translate="true" xsi:type="string">Booking Policy</argument>
+				</arguments>
+			</block>
+			<block class="Ced\Booking\Block\Product\View\ExtraTabs" name="product.info.booking.termsncondition" template="product/view/booking_terms_and_condition.phtml" group="detailed_info">
+				<arguments>
+					<argument name="title" translate="true" xsi:type="string">Terms and Condition</argument>
+				</arguments>
+			</block>
+			<block class="Ced\Booking\Block\Product\View\ExtraTabs" name="product.info.location" template="product/view/location.phtml" ifconfig="booking/booking_config/booking_address" group="detailed_info">
+				<arguments>
+					<argument translate="true" name="title" xsi:type="string">Location</argument>
+				</arguments>
+			</block>
+			<block class="Ced\Booking\Block\Product\View\Map" name="product.info.map" template="product/view/map.phtml" ifconfig="booking/booking_config/booking_address" group="detailed_info">
+				<arguments>
+					<argument translate="true" name="title" xsi:type="string">Map</argument>
+				</arguments>
+			</block> 
+		</referenceBlock>
+		<referenceContainer name="content">
+			<referenceContainer name="product.info.main">
+				<referenceBlock class="Magento\Catalog\Block\Product\View" name="product.info" template="Ced_Booking::product/view/form.phtml" after="alert.urls">
+					<block  class="Ced\Booking\Block\BookingForm" name="booking.form" template="Ced_Booking::product/view/booking_form.phtml"/>
+				</referenceBlock>
+			</referenceContainer>
+            <block before="product.info.details" class="Ced\Booking\Block\BookingContent" name="ced.booking.content" template="Ced_Booking::product/view/booking_content.phtml">
+	            <block class="Ced\Booking\Block\BookingHotelContent" name="booking.hotel.content" template="Ced_Booking::product/view/booking_hotel_content.phtml"/>
+	            <block class="Ced\Booking\Block\BookingRentContent" name="booking.rent.content" template="Ced_Booking::product/view/booking_rent_content.phtml"/>
+            </block> 
+        </referenceContainer>
+    </body>
+</page>

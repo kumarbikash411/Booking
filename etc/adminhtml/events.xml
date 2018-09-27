@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+ <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+ 	
+	<event name="catalog_product_save_after"> 
+		<observer name="ced_booking_catalog_product_save_after" instance="Ced\Booking\Observer\SaveProductAfter"/> 
+	</event>
+	<event name="sales_order_invoice_save_after"> 
+		<observer name="ced_booking_invoice_save_after" instance="Ced\Booking\Observer\InvoiceSaveAfter"/> 
+	</event>
+	<event name="order_cancel_after"> 
+		<observer name="ced_booking_cancel_order_after" instance="Ced\Booking\Observer\CancelOrderAfter"/> 
+	</event>
+	<event name="sales_order_creditmemo_save_after"> 
+		<observer name="ced_booking_creditmemo_save_after" instance="Ced\Booking\Observer\CreditmemoSaveAfter"/> 
+	</event>
+	<event name="layout_load_before">
+        <observer name="layout_load_before_cedcommerce" instance="Ced\Booking\Observer\BeforeLoadLayout" />
+    </event>
+	<!-- <event name="catalog_product_load_after"> 
+		<observer name="ced_booking_catalog_product_load_after" instance="Ced\Booking\Observer\ProductLoadAfter"/> 
+	</event> -->
+</config>

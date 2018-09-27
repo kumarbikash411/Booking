@@ -1,0 +1,186 @@
+<?php   $booking_type = $block->getBookingtype();
+        $facility = $block->getBookingtypeentfacilities(); 
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl();
+
+	    $_RentfacilityUrl = $_baseUrl.'admin/booking/productsave/productfacilitysave';
+	    $sku = $this->getSku(); 
+	    $id = $block->getProductfacilityrelation();
+	    $flag = false;
+	    foreach ($facility as $value) {
+	    	$fid[] = $value->getFacilityId();
+	    } 
+	    if ($id != false && isset($fid)) {
+	        foreach ($id as $ids) {
+	    	    $savedids[] = $ids;
+	        } 
+	        if ($savedids == $fid) {
+                $flag = true;
+	        }
+	    }
+
+	    ?>
+<div class="fieldset-wrapper admin__collapsible-block-wrapper opened">
+	<div class="fieldset-wrapper-title">
+		<strong>
+            <span><?php echo __('Assign Facilities To Booking Type') ?></span>
+        </strong>
+        <div style="float:right">
+        	<button class="primary" id="rent-facility-save">Save
+			</button>
+		</div>
+	</div>
+	<div class="admin__data-grid-wrap admin__data-grid-wrap-static">
+		<table id="gridGrid_table" class="data-grid">
+            <thead>
+                <tr>
+                    <th data-column="massaction" class="data-grid-th">
+                      <input type="checkbox" class="" title="<?php echo __('Check All') ?>" value="" id="check-mass-facility" <?php if((count($id) == count($facility)) && ($flag == true) )  { echo 'checked ="checked"';} ?> />
+                    </th>
+                    <th class="data-grid-th not-sort col-id col-entity_id"><span>Facility Name</span></th>
+                    <th class="data-grid-th not-sort col-id col-entity_id"><span>Facility Image</span></th>
+                    <th class="data-grid-th not-sort col-id col-entity_id"><span>Facility Description</span></th>                      
+                </tr>
+            </thead>
+            <tbody>
+                <?php if(count($facility)) : ?>
+				<?php foreach($facility  as $facilitydata) :
+				if($facilitydata->getFacilityStatus()): ?>
+                <tr class="even"> 
+                    <td class=" col-select col-massaction  data-grid-checkbox-cell">
+                        <input type="checkbox" class="rent-facility-data" value="<?php echo $facilitydata->getFacilityId(); ?>" name="bookingtyperent[facilities][]" <?php if($id != false){foreach($id as $fid){ if($fid== $facilitydata->getFacilityId()) { echo 'checked="checked"';}}} ?> />
+                    </td> 
+                    <td class=" col-select col-massaction data-grid-checkbox-cell">
+                        <label class="data-grid-checkbox-cell-inner"><input type="checkbox" class="admin__control-checkbox" value="34" data-role="select-row"><?php echo $title = $facilitydata->getFacilityTitle() ?></label>    
+                    </td> 
+                    <td class=" col-select col-massaction                                     data-grid-checkbox-cell">
+                        <label class="data-grid-checkbox-cell-inner"><input type="checkbox" class="admin__control-checkbox" value="34" data-role="select-row" name="id">
+                                <?php 
+									$image=$objectManager->create('\Magento\Store\Model\StoreManagerInterface')
+									->getStore()
+									->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA).$facilitydata->getFacilityImage();
+									$icon = $facilitydata->getFacilityImage();
+									if ((strpos ( $icon, 'fa-') !== false) || (strpos ($icon, 'im-') !== false)) {
+									$icon_class = explode('-', $facilitydata->getFacilityImage() ); 
+									$type_font = $icon_class[0];
+									$html = '<i class="ace-icon '.$type_font.' '.$facilitydata->getFacilityImage().' fa-2x"></i>';
+									} else {
+									$html = '<img src="'.$image . '"height="' . '50px' . '"';
+									$html .= '/>';
+									}
+									echo $html;
+								?>
+							</label>    
+                    </td> 
+                    <td class=" col-select col-massaction                                     data-grid-checkbox-cell">
+                        <label class="data-grid-checkbox-cell-inner"><input type="checkbox" class="admin__control-checkbox" value="34" data-role="select-row" name="id"><?php $description = $facilitydata->getFacilityDesc(); 
+									echo isset($description)?$description:'N/A'; 
+									 ?>
+						</label>    
+                    </td> 
+                </tr>
+                <?php   endif;
+                    	endforeach;
+                    	endif;?>
+        	</tbody>
+        </table>
+						<script>
+						require([
+									'jquery',
+									'Magento_Ui/js/modal/alert',
+								],
+								function($,alert) {
+									$('#check-mass-facility').click(function(){
+										if($(this).is(":checked"))
+										{
+											$('.rent-facility-data').prop('checked',true);
+										}
+										else
+										{
+											$('.rent-facility-data').prop('checked',false);
+										}
+
+
+									});
+
+									$('[name="bookingtyperent[facilities][]"]').click(function(){
+
+									if($('#check-mass-facility').is(":checked")){
+
+
+										if($('[name="bookingtyperent[facilities][]"]').is(":checked"))
+											{
+												$('#check-mass-facility').prop('checked',false);
+											}else{
+												console.log('yupppp');
+											}
+
+
+										}
+									});
+
+
+									
+
+									//for saving facility data 
+								
+							var url="<?php echo $_RentfacilityUrl; ?>"
+							var sku="<?php echo $sku; ?>";
+							var bookingtype = "<?php echo $booking_type; ?>";
+							/*sku = "<?php echo $block->getProductSku(); ?>"*/
+							
+						/*	if(sku)
+							{
+								$('#booking_product_sku').attr('value',sku);
+							}*/
+							$('#rent-facility-save').click(function(){
+									
+								//if(!sku){
+									//sku = $('[name="product[sku]"]').val();
+									//var productid = '';
+
+								//}
+								var myArray = [];
+								 $(".rent-facility-data:checked").each(function() {
+		       						 myArray.push(this.value);
+		   							 });
+
+								 if(!sku)
+									{
+										alert({
+											title: 'Error Message',
+											content: '<?php echo __(' Please fill the product sku') ?>'
+										});
+										return false;
+									}
+								 $.ajax({
+											url : url,
+											dataType : 'json',
+											type : 'POST',
+											showLoader: true,
+											data : {sku : sku,facility_id : myArray,booking_type: bookingtype},
+											success : function(res)
+											{
+												 $('#bookingtyperent_facilities').html(res.renttemplate);
+											
+												alert({
+												title: 'Save Details:',
+												content: 'Facilities Assigned to Product'
+												});
+											},
+											error : function(err)
+											{
+												$('#booking-popup-modal-room').html(err.html_room);
+											}
+									});
+							});
+								})
+						</script>
+					<!-- <?php //endif; ?>
+				</div>
+			</div>
+		</fieldset> -->
+	</div>
+</div>

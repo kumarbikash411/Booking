@@ -1,0 +1,154 @@
+<?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  $params = $this->getRequest()->getParams();
+	  $product_id = $block->getCurrentProduct()->getId();
+	  $QtyForaDay = $block->getCurrentProduct()->getStockQtyForADay();
+	  $price = $block->getCurrentProduct()->getFinalPrice();
+	  $currencySymbol = $block->getCurrencySymbol();
+      $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+						->getStore()
+						->getBaseUrl(); 
+	  $checkRentAvailabilityUrl = $_baseUrl.'booking/booking/checkrenttypeproductavailability';
+     
+?>
+<div class="product-add-form">
+
+
+
+	<div class="product-options-wrapper">
+			<div class="fieldset" id="date_range">
+			 	<div class="field">
+		            <label class="label" for="rent-form-check-in">
+		                <span>Check In</span>
+		            </label>
+		            <div class="control">
+		            <input type="hidden" id="booking-type" name="booking-type" value="<?php echo __('rent_daily');?>"/>
+						<input type="text" autocomplete="off" id="rent-form-check-in" name="check-in" value="<?php if (isset($params['check_in'])) { echo $params['check_in']; } ?>" readonly="true" />
+		            </div>
+		        </div>
+
+
+				<div class="field">
+		            <label class="label" for="rent-form-check-out">
+		                <span>Check Out</span>
+		            </label>
+		            <div class="control">
+						<input type="text" autocomplete="off" id="rent-form-check-out" name="check-out" value="<?php if (isset($params['check_out'])) { echo $params['check_out']; } ?>" readonly="true"/>
+		            </div>
+		        </div>
+
+
+		        <div class="field">
+		            <label class="label" for="rent-qty">
+		                <span>Qty</span>
+		            </label>
+		            <div class="control">
+		                <select class="rent-qty" id="rent-qty" name="qty">
+							<?php for ($i=1;$i<=$QtyForaDay; $i++) { ?>
+								<option value="<?php echo $i;?>"><?php echo $i; ?></option>
+								<?php } ?>
+						</select>
+
+		            </div>
+		        </div>
+
+ 			<div class="field">
+				<div id="rent-availability-info"></div>
+			</div>	
+
+				
+		    <div class="product-options-bottom">
+		   	 <div class="box-tocart">
+
+		        <div class="actions">
+		            <button  id="rent-daily-check-availablity" class="action subscribe primary" title="Check Availability" type="button">
+		                <span><?php echo __('Check Availability') ?></span>
+		            </button>
+		        </div>
+		       </div>
+		     </div>
+
+			</div>
+			</div>	
+
+	
+	<?php
+		echo $this->getLayout()->createBlock('Magento\Catalog\Block\Product\View')->setTemplate('Ced_Booking::product/view/addtocart.phtml')->toHtml();
+	?>
+</div>
+
+<script>
+	require([
+			'jquery',
+			"jquery/ui",
+			"mage/calendar"
+		],
+	function ($){
+		
+		// var dateToday = new Date();
+		// $("#date_range").dateRange({
+  //        		dateFormat: "yy-mm-dd",
+  //        		 minDate: dateToday,
+  //                buttonText:"<?php echo __('Select Date') ?>",
+  //                   from:{
+  //                       id:"rent-form-check-in"
+  //                   },
+  //                   to:{
+  //                       id:"rent-form-check-out"
+  //                   }
+                
+  //       });
+
+
+        var dateToday = new Date();
+
+  			$( "#rent-form-check-in, #rent-form-check-out" ).datepicker({
+				minDate: dateToday,
+				dateFormat: "yy-mm-dd",
+				onSelect: function( selectedDate, inst) {
+					$('#product-addtocart-button').prop('disabled',true);
+					var date = jQuery.datepicker.parseDate(inst.settings.dateFormat || jQuery.datepicker._defaults.dateFormat, selectedDate, inst.settings);
+					var dateText = jQuery.datepicker.formatDate("yy-mm-dd", date, inst.settings);
+					if(this.id == "rent-form-check-in"){										
+						date.setDate(date.getDate());
+						jQuery("#rent-form-check-out" ).datepicker( "option", "minDate", date );
+					}
+					
+				}
+			});
+
+	$('.rent-qty').change(function(){
+
+		$('#product-addtocart-button').prop('disabled',true);
+	});
+
+
+    $('#rent-daily-check-availablity').click(function(){
+    	var price = "<?php echo $price; ?>";
+    	var checkIn = $('#rent-form-check-in').val();
+    	var checkOut = $('#rent-form-check-out').val();
+    	var qty = $('.rent-qty').val();
+    	var product_id = "<?php echo $product_id; ?>";
+ 
+		    $.ajax({
+				url : '<?php echo $checkRentAvailabilityUrl; ?>',
+				dataType : 'json',
+				type : 'POST',
+				data : {check_in: checkIn,check_out: checkOut,qty: qty,price:price,product_id:product_id,rent:'daily'},
+				showLoader: true,
+				success : function(res)
+				{
+					$('#rent-availability-info').html(res.template);
+				},
+				error : function()
+				{
+						
+				}
+			}); 
+	 	
+	});
+	$('#product-addtocart-button').click(function(){
+		$('#product-addtocart-button').prop('disabled',true);
+	});
+    
+});
+</script>

@@ -1,0 +1,262 @@
+#owl-demo .item img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#owl-demo-room .item img{
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#owl-facilities img ,#owl-demo-rent-daily .item img{
+    display: block;
+    width: 50%;
+    height: auto;
+    margin:0 auto;
+}
+
+.booking-banner{
+    width:100%;
+    height:50%;
+}
+.col-5 > .col{
+    width:18%;
+    float:left;
+    padding: 5px;
+}
+.col-4 > .col{
+    width:19%;
+    float:left;
+    padding: 5px;
+}
+.col-2 .col{
+    width:50%;
+    float:right;
+    margin-left: 0px;
+}
+.page-layout-1column .toolbar-products{
+    position: static !important;
+}
+
+.hotel-facilities{
+    margin-bottom:30px;
+}
+.hourly-fields {
+  width: 24% !important;
+}
+.ace-icon{
+    font-size: 92px;
+    margin:0 auto;
+}
+.facility-title{
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+#facility-wrapper{
+    border: 1px solid #cccccc;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 10px;
+}
+#owl-facilities .item, #owl-demo-rent-daily .item, #owl-facilities-room .item{
+    text-align: center;
+    line-height: 1;
+}
+
+.facility-image{
+    text-align: center;
+}
+
+#all-room-listing{
+    margin-top:70px;
+}
+
+#all-room-listing th, #all-room-listing td {
+  border: 1px solid #cccccc;
+}
+.modal-room-title {
+    text-align:center;
+}
+.hotel-min-price {
+    font-weight: 700;
+}
+span.room-info-label {
+    font-weight: 600;
+}
+.room-info-wrapper {
+    border: 1px solid #cccccc;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 10px;
+}
+#book-room-check-in {
+    width: 90%;
+}
+#book-room-check-out {
+    width: 90%;
+}
+#room-qty {
+    width: 125%;
+}
+.booking-form {
+    float: right;
+    margin-right: 39%;
+}
+.room-popup-qty-field {
+    float: right;
+    margin-right:66%;
+}
+
+.booking-form-price {
+    float: right;
+    margin-right: 66%;
+}
+header.modal-header {
+    position: relative !important;
+}
+
+.booking-search-wrapper .col {    
+    position: relative;
+}
+.booking-search-wrapper .col .input-icon { 
+   position: absolute;    right: 5px;    top: 8px;
+}
+.booking-search-wrapper .col .fa.fa-map-marker.input-icon {  
+  top: 15px;    right: 10px;
+}
+td.fc-day.fc-past {
+    background-color: #EEEEEE;
+}
+#price-range-slider a{
+    background-color :#006bb4;
+}
+.reset-filter-action {
+    float: right;
+    margin-top: -66px;
+    position: sticky;
+}
+
+.toolbar.toolbar-products {
+    margin-top: 48px;
+}
+
+.fc-week {
+    height: 70px !important;
+}
+.fc-day-grid-container {
+    height: auto !important;
+}
+#booking_calendar {
+    margin-bottom: 36px;
+}
+
+.booking-left-price-filter > li {
+    list-style: none;
+}
+.booking-left-amenity-filter > li {
+    list-style: none;
+}
+.booking-left-star-filter > li {
+    list-style: none;
+}
+
+
+/*** top link font css ***/
+.header.panel > .header.links {
+  font-size: 1.4rem !important;
+}
+
+/*booking facilites*/
+.booking-facilites::after {
+  clear: both;
+  content: "";
+  display: table;
+}
+.booking-facilites .item {
+  float: left;
+  width: 8%;
+}
+.booking-facilites .item .ace-icon {
+  font-size: 28px;
+  margin-top: 7px;
+}
+.booking-facilites .item img {
+  margin-top: 4px;
+  width: 55%;
+}
+
+/*** facility zoom image ***/
+.facility-modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: #FFFFFF; 
+}
+
+.facility-modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+.facility-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+.facility-modal-content, .facility-caption {    
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+.facility-img-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.facility-img-close:hover,
+.facility-img-close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media only screen and (max-width: 700px){
+    .facility-modal-content {
+        width: 100%;
+    }
+}
+/*** facility zoom image end ***/

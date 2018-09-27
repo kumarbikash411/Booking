@@ -1,0 +1,116 @@
+<?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  $image = $block->getConfigBanner();
+	  $helper = $objectManager->create('Ced\Booking\Helper\Booking\Image');
+	  $Datahelper = $objectManager->create('Ced\Booking\Helper\Data');
+	  $configwidth = $Datahelper->getStoreConfigValue('booking/banner_setting/banner_width');
+	  $configheight = $Datahelper->getStoreConfigValue('booking/banner_setting/banner_height');
+	  $placeholder = $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');
+	  $width = $configwidth != ''? $configwidth : 800;
+	  $height= $configheight != ''? $configheight : 200; 
+
+	  $_baseUrl = $objectManager->get('Magento\Store\Model\StoreManagerInterface')
+							   ->getStore()
+                               ->getBaseUrl();
+      $urlsearch = $_baseUrl.'booking/booking/searchrentbooking';
+?>
+<div>
+	<p>
+		<img id="booking-banner"
+	         src="<?php echo $helper->resize($image,$width,$height,$placeholder)  ?>"
+	          alt="Booking Banner" height="100%" width="100%" />
+	</p>
+	<div>
+		<form id="rent-search-form">
+			<input type="hidden" value="" name="address" id="rent-address"></input>
+			<div>
+				<div>
+					<i class="fa fa-map-marker input-icon"></i>
+					<input id="rentsearchByaddress" name="search_by_address" type="text" placeholder="Where" value="">
+				</div>
+				<div>
+					<div id="date_range">
+						<div>
+							<i class="fa fa-calendar input-icon input-icon-highlight"></i>
+							<input type="text" id="rent-check-in" name="check_in" placeholder="check-in" value="" class="form-control" readonly="true">
+						</div>
+						<div>
+							<i class="fa fa-calendar input-icon input-icon-highlight"></i>
+							<input type="text" id="rent-check-out" name="check_out" placeholder="check-out" value=""class="form-control" readonly="true">
+						</div>
+					</div>
+				</div>
+				<div>
+					<select id="searchbyprice" name="search_by_price">
+						<option value="0-2000">0-2000</option>
+						<option value="2000-5000">2000-5000</option>
+						<option value="5000-above">5000 & above</option>
+					</select>
+				</div>
+				<div>
+					<input type="button" id="rent-search-button" class="primary" value="Search"></input>
+				</div>				
+			</div>
+		</form>
+		<div id="rent-booking-product-lists">
+			<?php echo $this->getLayout()->createBlock('Ced\Booking\Block\RentProductListing')->setTemplate('Ced_Booking::rent_product_listing.phtml')->toHtml();?>
+		</div>
+		<div id="rent-booking-searched-product-lists"></div>
+	</div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&language=en"></script>
+
+<script>
+	require([
+		'jquery',
+		"jquery/ui",
+		"mage/calendar"
+		],
+		function ($){
+
+			 var input = document.getElementById('rentsearchByaddress');
+     		 var autocomplete = new google.maps.places.Autocomplete(input,{types: ['(cities)']});
+      		google.maps.event.addListener(autocomplete, 'place_changed', function(){
+         		var place = autocomplete.getPlace();
+         		document.getElementById('rent-address').value = place.address_components[0].long_name;
+
+      		});
+
+  		  $("#date_range").dateRange({
+     		dateFormat: "yy-mm-dd",
+             buttonText:"<?php echo __('Select Date') ?>",
+                from:{
+                    id:"rent-check-in"
+                },
+                to:{
+                    id:"rent-check-out"
+                }
+           });
+
+
+
+		    /* on click search button */
+
+		    setTimeout(function(){
+
+			    $('#rent-search-button').click(function(){
+			    	$.ajax({
+	   					url : '<?php echo $urlsearch; ?>',
+	   					dataType : 'json',
+	   					type : 'POST',
+	   					data : $('#rent-search-form').serialize(),
+	   					showLoader: true,
+	   					success : function(res)
+	   					{
+	   						$('#rent-booking-product-lists').hide();
+	   						$('#rent-booking-searched-product-lists').html(res.template);
+	   					},
+	   					error : function()
+	   					{
+
+	   					}
+	   				}); 
+			    });
+			},1000);
+		});
+</script>

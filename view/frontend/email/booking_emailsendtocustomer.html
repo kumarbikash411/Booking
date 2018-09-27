@@ -1,0 +1,35 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "You have successfully placed order"}} @-->
+
+{{template config_path="design/email/header_template"}}
+<table cellspacing="0" cellpadding="0" border="0" height="100%" width="100%">
+        <tr>
+            <td>
+                <table cellspacing="0" cellpadding="0" border="0" width="650">
+                    <tbody>
+                        <tr>
+                            <td colspan="2" valign="top" style="font-size:12px;padding:7px 9px 9px 9px;border:1px solid #EAEAEA;">{{trans "Dear, %customer_name" customer_name=$customer_name}}
+                            </td>
+                     	</tr>
+                     	<tr>
+                            <td colspan="2" valign="top" style="font-size:12px;padding:7px 9px 9px 9px;border:1px solid #EAEAEA;">{{trans "Your Order#%increment_id" increment_id=$increment_id}}
+                            </td>
+                     	</tr>
+                   	</tbody>
+                </table>
+            </td>
+       	</tr>
+		<tr>
+			<h3>{{trans "Grand Total: $%grand_total" grand_total=$grand_total}}</h3>
+		</tr>
+		<tr>
+			<h3>{{trans "Thank You"}}</h3>
+		</tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

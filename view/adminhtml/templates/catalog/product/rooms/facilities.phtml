@@ -1,0 +1,87 @@
+<?php $facilities = $this->getRoomfacilities(); ?>
+<?php $roomId = $block->getData('roomId'); ?>
+<?php $facilityIds = $this->getRoomfacilitiesids($roomId); 
+$count=0;
+foreach($facilities  as $facility)
+{
+	if ($facility->getFacilityType()=="room")
+	{
+		$count++;
+	}
+}
+?>
+<div class="fieldset-wrapper admin__collapsible-block-wrapper opened">
+	<div class="fieldset-wrapper-title">
+		<strong>
+            <span><?php echo __('Facilities') ?></span>
+        </strong>
+	</div>
+	<div class="fieldset-wrapper-content in collapse">
+		<fieldset class="fieldset">
+			<div id="booking-room-list-facility-items" class="booking-table-items">
+				<div class="booking-list-items-header">
+					<span class="booking-label booking-label-facility-input">
+						<input type="checkbox" class="" title="<?php echo __('Check All') ?>" value="" id="booking-room-facilities-check-all" 
+						<?php 
+						if($facilityIds)	
+							if($count == count(json_decode($facilityIds))) echo 'checked="checked"'; ?> />
+					</span>
+					<span class="booking-label"><?php echo __('Title'); ?></span>
+					<span class="booking-label booking-label-facility-description"><?php echo __('Description'); ?></span>
+				</div>
+				<div class="booking-list-items-content">
+					<?php if(count($facilities )) : ?>
+						<?php foreach($facilities  as $facility) :
+						   if ($facility->getFacilityType()=="room") : ?>
+							<div class="booking-list-item">
+								<span class="booking-data booking-data-facility-input">
+									<input type="checkbox" class="booking-room-facility-item" value="<?php echo $facility->getFacilityId(); ?>" name="room_facilities_id[]" 
+									<?php
+									if($facilityIds):
+									if(is_array(json_decode($facilityIds))) 
+									foreach (json_decode($facilityIds) as $value) :
+											if($facility->getFacilityId() == $value) echo 'checked="checked"'; 
+										endforeach;
+										endif;
+									?>
+									/>
+								</span>
+								<span class="booking-data">
+									<?php //$title = $this->getbookingStrText($facility->getFacilityTitle(),$facility->getFacilityTitleTransalte(),$storeId); ?>
+									<?php echo $facility->getFacilityTitle(); ?>				
+								</span>
+								<span class="booking-data booking-data-facility-description">
+									<?php //$description = $this->getbookingStrText($facility->getFacilityDescription(),$facility->getFacilityDesTranslate(),$storeId); ?>
+									<?php //$description = $this->shortDescription($description,50); ?>
+									<?php echo $facility->getFacilityDesc();; ?>
+								</span>
+							</div>
+							<?php endif;?>
+						<?php endforeach; ?>
+						<?php endif;?>
+						<script>
+							require([
+									'jquery',
+								],
+								function($) {
+									// check all options js
+									$('#booking-room-facilities-check-all').click(function(){
+										if($(this).is(":checked"))
+										{
+											$('.booking-room-facility-item').prop('checked',true);
+										}
+										else
+										{
+											$('.booking-room-facility-item').prop('checked',false);
+										}
+									});
+
+
+								}) 
+						</script>
+					<?php //endif; ?>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+</div>

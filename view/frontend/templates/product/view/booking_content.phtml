@@ -1,0 +1,13 @@
+<?php $bookingtype = $block->getProductBookingType(); 
+?>
+<div style="clear: both;"></div>
+<?php if ($bookingtype == 'Hotel Booking') { ?>
+	<div id="hotel-rooms-listing">
+<?php echo $block->getChildHtml('booking.hotel.content'); ?>
+	</div>
+	<div id="search-rooms-listing"></div>
+<?php } elseif (($bookingtype == 'Daily Rent Booking') || ($bookingtype == 'Hourly Rent Booking')) { 
+	echo $block->getChildHtml('booking.rent.content');
+
+}
+?>

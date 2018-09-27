@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * CedCommerce
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the End User License Agreement (EULA)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://cedcommerce.com/license-agreement.txt
+ *
+ * @category    Ced
+ * @package     Ced_Booking
+ * @author 		CedCommerce Core Team <connect@cedcommerce.com>
+ * @copyright   Copyright CedCommerce (http://cedcommerce.com/)
+ * @license      http://cedcommerce.com/license-agreement.txt
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+     <head>
+     	<!-- <script src="Ced_Booking::js/map.js"/> -->
+     	<!-- <css src="Ced_Booking::alert/css/alert.css"/>
+		<css src="Ced_Booking::alert/themes/default/theme.css"/>
+		<script src="Ced_Booking::alert/js/alert.js"></script> -->
+        <css src="Ced_Booking::css/bootstrap.min.css" />
+		<css src="Ced_Booking::css/style_finder.css" />
+		<css src="Ced_Booking::css/style_search.css" />
+		<css src="Ced_Booking::css/global_style.css" />
+		<css src="Ced_Booking::css/font-awesome.min.css" />
+		<css src="Ced_Booking::css/font-awesome.css" />
+	</head>
+	<body>
+        <referenceContainer name="content">
+            <block class="Ced\Booking\Block\Search" name="booking.search" template="Ced_Booking::search/search.phtml" />
+           <!--  <block class="Ced\Booking\Block\Search" name="booking.product" template="Ced_Booking::search/search_booking.phtml" /> -->
+		</referenceContainer>
+    </body>
+</page>
